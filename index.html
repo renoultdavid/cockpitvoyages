@@ -568,11 +568,8 @@
 
       myGlobe = Globe()(container)
         .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg')
-        .bumpImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
         .backgroundColor('rgba(2, 6, 23, 1)')
-        .showAtmosphere(true)
-        .atmosphereColor('#38bdf8')
-        .atmosphereAltitude(0.18)
+        .showAtmosphere(false)
         .htmlElementsData([])
         .htmlLat(d => d.lat)
         .htmlLng(d => d.lng)
@@ -626,6 +623,15 @@
         });
 
       myGlobe.pointOfView({ lat: 27.2579, lng: 33.8116, altitude: 2.1 }, 0);
+
+      // Bride la résolution de rendu WebGL à 1 pour soulager drastiquement le processeur graphique
+      try {
+        if (typeof myGlobe.renderer === 'function') {
+          myGlobe.renderer().setPixelRatio(1);
+        }
+      } catch (e) {
+        console.warn("Ajustement du pixel ratio ignoré:", e);
+      }
 
       const controls = myGlobe.controls();
       controls.autoRotate = false;
