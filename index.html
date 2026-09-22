@@ -5,22 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Cockpit Voyage - Globe 3D & Carte Rando HD</title>
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-  <!-- Leaflet 2D HD -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Leaflet MarkerCluster -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/1.5.3/leaflet.markercluster.Default.css" />
   <script src="https://unpkg.com/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
-
-  <!-- Globe.gl 3D -->
   <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js"></script>
 
   <style>
@@ -36,7 +27,7 @@
     }
 
     .glass-panel {
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(15, 23, 42, 0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -56,7 +47,7 @@
 
     @keyframes radar-pulse-dynamic {
       0% { transform: scale(0.6); opacity: 0.9; }
-      100% { transform: scale(var(--pulse-scale, 2.5)); opacity: 0; }
+      100% { transform: scale(var(--pulse-scale, 2.8)); opacity: 0; }
     }
     .marker-radar-dynamic {
       animation: radar-pulse-dynamic var(--pulse-speed, 2s) cubic-bezier(0, 0, 0.2, 1) infinite;
@@ -64,10 +55,18 @@
 
     @keyframes counter-pulse {
       0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(34, 211, 238, 0); }
-      50% { transform: scale(1.04); box-shadow: 0 0 14px rgba(34, 211, 238, 0.5); }
+      50% { transform: scale(1.03); box-shadow: 0 0 12px rgba(34, 211, 238, 0.4); }
     }
     .counter-pulse-anim {
-      animation: counter-pulse 2.5s ease-in-out infinite;
+      animation: counter-pulse 2.8s ease-in-out infinite;
+    }
+
+    @keyframes counter-pulse-amber {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
+      50% { transform: scale(1.03); box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
+    }
+    .counter-pulse-amber-anim {
+      animation: counter-pulse-amber 3.2s ease-in-out infinite;
     }
 
     .custom-cluster-icon {
@@ -85,11 +84,14 @@
 
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .panel-transition {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, width 0.3s ease;
+    }
   </style>
 </head>
 <body class="relative w-full h-full bg-slate-950 font-sans antialiased text-slate-100 overflow-hidden">
 
-  <!-- VUE GLOBE 3D -->
   <div id="globe-view" class="absolute inset-0 w-full h-full z-0 transition-opacity duration-500 opacity-100 pointer-events-auto">
     <div id="globe-container" class="w-full h-full"></div>
     <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -99,12 +101,10 @@
     </div>
   </div>
 
-  <!-- VUE CARTE 2D HD -->
   <div id="map-view" class="absolute inset-0 w-full h-full z-0 transition-opacity duration-500 opacity-0 pointer-events-none bg-slate-950">
     <div id="leaflet-container" class="w-full h-full"></div>
   </div>
 
-  <!-- EN-TÊTE & COMMANDES HAUT -->
   <header class="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
     <div class="flex items-center gap-2 pointer-events-auto">
       <div class="glass-panel px-3 py-2 rounded-2xl flex items-center gap-2.5">
@@ -130,8 +130,30 @@
       </div>
     </div>
 
+    <!-- COMPTEURS HAUT CENTRE (SITES & PAYS VISITÉS) AVEC PULSATION DISCRÈTE -->
+    <div class="flex items-center gap-2 pointer-events-auto">
+      <div class="glass-panel px-3 py-1.5 rounded-2xl flex items-center gap-2 counter-pulse-anim border-cyan-500/40">
+        <div class="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs">
+          <i class="fa-solid fa-map-pin"></i>
+        </div>
+        <div>
+          <div class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Sites visités</div>
+          <div id="header-stat-sites" class="text-xs font-black text-cyan-300 font-mono">5</div>
+        </div>
+      </div>
+      <div class="glass-panel px-3 py-1.5 rounded-2xl flex items-center gap-2 counter-pulse-amber-anim border-amber-500/40">
+        <div class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs">
+          <i class="fa-solid fa-globe"></i>
+        </div>
+        <div>
+          <div class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Pays visités</div>
+          <div id="header-stat-countries" class="text-xs font-black text-amber-300 font-mono">1</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Saut Rapide -->
-    <div class="flex items-center gap-1.5 pointer-events-auto glass-panel px-2.5 py-1.5 rounded-2xl">
+    <div class="hidden lg:flex items-center gap-1.5 pointer-events-auto glass-panel px-2.5 py-1.5 rounded-2xl">
       <button onclick="flyToSpotCoordinates(27.2579, 33.8116, 12)" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-cyan-500/25 hover:bg-cyan-500/35 text-cyan-300 border border-cyan-500/40 transition flex items-center gap-1">
         <span>🐠</span> Hurghada
       </button>
@@ -147,62 +169,80 @@
     </div>
   </header>
 
-  <!-- PANNEAU FILTRES GAUCHE -->
-  <aside id="left-filters" class="absolute top-16 left-3 z-30 flex flex-col gap-2 w-56 sm:w-60 pointer-events-auto max-h-[calc(100vh-6rem)] overflow-y-auto no-scrollbar">
-    <div class="glass-panel rounded-2xl p-3 shadow-2xl">
-      <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-700/60">
-        <div class="flex items-center gap-1.5">
-          <i class="fa-solid fa-filter text-cyan-400 text-xs"></i>
-          <h2 class="text-xs font-bold tracking-wide uppercase text-slate-200">Filtres Visite</h2>
+  <aside id="left-dock" class="absolute top-16 left-3 z-30 flex items-start pointer-events-auto">
+    <div class="flex items-start">
+      <div id="filters-panel" class="glass-panel rounded-2xl p-3 shadow-2xl w-64 sm:w-72 overflow-y-auto no-scrollbar panel-transition relative">
+        <!-- Ligne unique d'en-tête de filtre sur toute la largeur -->
+        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-700/60">
+          <div class="flex items-center gap-1.5">
+            <i class="fa-solid fa-filter text-cyan-400 text-xs"></i>
+            <h2 class="text-xs font-bold tracking-wide uppercase text-slate-200">Filtres</h2>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="setAllFilters(true)" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-semibold underline">Tout</button>
+            <span class="text-slate-600 text-[10px]">·</span>
+            <button onclick="setAllFilters(false)" class="text-[10px] text-slate-400 hover:text-rose-400 font-semibold underline">Aucun</button>
+            <button onclick="toggleFiltersPanel()" class="ml-1 text-slate-400 hover:text-white text-xs" title="Replier les filtres"><i class="fa-solid fa-chevron-left"></i></button>
+          </div>
         </div>
-        <div class="flex items-center gap-1.5">
-          <button onclick="setAllFilters(true)" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-semibold underline">Tout</button>
-          <span class="text-slate-600 text-[10px]">·</span>
-          <button onclick="setAllFilters(false)" class="text-[10px] text-slate-400 hover:text-rose-400 font-semibold underline">Aucun</button>
-        </div>
+        <!-- Liste unifiée : chaque ligne combine l'icône, le nom et le compteur -->
+        <div id="unified-category-list" class="space-y-1 text-xs"></div>
       </div>
-      <div id="category-toggles" class="space-y-1 text-xs"></div>
+
+      <!-- BOUTON DE DÉPLOIEMENT QUAND LE PANNEAU EST FERMÉ -->
+      <button id="btn-open-filters" onclick="toggleFiltersPanel()" class="glass-panel hidden px-2 py-3 rounded-xl text-cyan-400 hover:text-white text-xs shadow-2xl flex items-center justify-center ml-1" title="Ouvrir les filtres">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
     </div>
   </aside>
 
-  <!-- COMPTEUR ULTRA-ÉTROIT DROITE -->
-  <aside id="right-narrow-hud" class="absolute top-16 right-3 z-30 flex flex-col items-end pointer-events-auto w-16">
-    <div class="glass-panel rounded-2xl py-2 px-2 shadow-2xl flex flex-col items-center gap-1.5 max-h-[calc(100vh-6rem)] overflow-y-auto no-scrollbar border-slate-700/60 w-16">
-      <div class="w-full py-1.5 rounded-xl bg-cyan-950/80 border border-cyan-500/40 flex flex-col items-center justify-center text-center shadow-inner relative overflow-hidden counter-pulse-anim" title="Total des sites visités">
-        <span class="absolute inset-0 bg-cyan-400/10 pointer-events-none"></span>
-        <i class="fa-solid fa-map-pin text-cyan-400 text-[11px] mb-0.5"></i>
-        <span id="stat-total" class="font-mono font-black text-cyan-300 text-xs leading-none relative z-10">0</span>
-      </div>
-      <div class="w-8 h-[1px] bg-slate-700/60 my-0.5"></div>
-      <div id="narrow-hud-list" class="flex flex-col gap-1 w-full items-center"></div>
-    </div>
-  </aside>
-
-  <!-- CARTE INFO DESTINATION (FLOTTANTE DROITE SOUS HUD) -->
-  <section id="destination-card" class="absolute top-44 right-20 z-40 glass-panel rounded-2xl p-4 shadow-2xl border-cyan-500/40 hidden pointer-events-auto transition-all duration-300 w-96 sm:w-[440px] flex flex-col justify-between">
+  <section id="destination-card" class="absolute top-16 right-3 z-40 glass-panel rounded-2xl p-4 shadow-2xl border-cyan-500/40 hidden pointer-events-auto transition-all duration-300 w-[440px] sm:w-[540px] flex flex-col justify-between max-h-[calc(100vh-5rem)] overflow-y-auto no-scrollbar">
     <div class="relative flex flex-col gap-3">
       <button onclick="closeSpotCard()" class="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-xs transition z-10 border border-slate-700">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <div class="w-full h-44 rounded-xl overflow-hidden bg-slate-900 shrink-0 relative border border-slate-700/50">
+      <!-- EN-TÊTE PAYS & RÉGION / ÉTAT -->
+      <div id="card-geo-header" class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800/80 text-xs font-medium text-slate-300">
+        <span id="card-flag" class="text-base"></span>
+        <span id="card-country-region" class="truncate font-semibold text-white"></span>
+      </div>
+
+      <!-- IMAGE PROPRE -->
+      <div class="w-full h-48 rounded-xl overflow-hidden bg-slate-900 shrink-0 relative border border-slate-700/50">
         <img id="card-img" src="" alt="Aperçu destination" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x200/0f172a/38bdf8?text=Voyage'">
       </div>
 
-      <div class="flex flex-col gap-1">
-        <!-- Espace dédié entre l'image et le titre pour les cartouches d'étiquettes -->
-        <div id="card-photo-tags" class="flex flex-wrap items-center gap-1.5 mb-1"></div>
+      <!-- ESPACE DÉDIÉ SOUS L'IMAGE POUR LES ÉTIQUETTES -->
+      <div id="card-photo-tags" class="flex flex-wrap items-center gap-1.5 min-h-[26px]"></div>
 
+      <!-- TITRE & COORDONNÉES -->
+      <div class="flex flex-col gap-0.5">
         <h3 id="card-title" class="text-sm font-bold text-white pr-4"></h3>
-        <p id="card-location" class="text-[10px] text-cyan-400 font-medium flex items-center gap-1 mt-0.5">
+        <p id="card-location" class="text-[10px] text-cyan-400 font-medium flex items-center gap-1">
           <i class="fa-solid fa-location-dot"></i> <span></span>
         </p>
-        <!-- Description calibrée à 6-7 lignes minimum -->
-        <p id="card-description" class="text-[11px] text-slate-300 leading-relaxed my-2 line-clamp-7 h-[105px] overflow-hidden"></p>
+      </div>
+
+      <!-- SECTION 1 : INTRODUCTION (6-7 LIGNES) -->
+      <div class="flex flex-col gap-1 bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1">
+          <i class="fa-solid fa-book-open"></i> Introduction
+        </div>
+        <p id="card-description" class="text-[11px] text-slate-300 leading-relaxed line-clamp-[7] h-[115px] overflow-y-auto no-scrollbar pr-1"></p>
+      </div>
+
+      <!-- SECTION 2 : À VISITER / INCONTOURNABLES (6-7 LIGNES) -->
+      <div class="flex flex-col gap-1 bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+          <i class="fa-solid fa-compass"></i> À visiter & Incontournables
+        </div>
+        <p id="card-visiter" class="text-[11px] text-slate-300 leading-relaxed line-clamp-[7] h-[115px] overflow-y-auto no-scrollbar pr-1"></p>
       </div>
     </div>
 
-    <div class="flex flex-col gap-2 pt-2.5 border-t border-slate-700/60 mt-auto">
+    <!-- BOUTONS D'ACTION -->
+    <div class="flex flex-col gap-2 pt-3 border-t border-slate-700/60 mt-3">
       <a id="card-link" href="#" target="_blank" rel="noopener noreferrer" class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-[11px] font-semibold flex items-center justify-center gap-1.5 shadow-md shadow-cyan-500/20 transition">
         <i class="fa-solid fa-images text-[10px]"></i>
         <span>Voir l'album photo</span>
@@ -215,7 +255,6 @@
     </div>
   </section>
 
-  <!-- CONTRÔLES BAS GAUCHE -->
   <div class="absolute bottom-4 left-3 z-30 flex flex-col gap-1.5 pointer-events-auto">
     <button id="btn-toggle-tiles" onclick="toggleMapTileLayer()" class="glass-panel w-9 h-9 rounded-xl flex items-center justify-center text-cyan-300 hover:text-white transition shadow-lg hidden" title="Basculer Satellite / Topo">
       <i class="fa-solid fa-layer-group text-xs"></i>
@@ -236,67 +275,77 @@
       {
         id: "hurghada",
         name: "Hurghada (Mer Rouge)",
-        region: "egypte",
+        region: "Gouvernorat de la Mer-Rouge",
         country: "Égypte",
+        flag: "🇪🇬",
         category: "plage",
         counts: { plage: 1 },
         lat: 27.2579,
         lng: 33.8116,
         image: "https://lh3.googleusercontent.com/pw/AP1GczPVx1_9UPwnhcWOyxckSpIvYC2T7xDRFTOGeQEiu82QKFht2G6YoXd-HB0DbIDdJ4ebV00ThDFY_RWXl7IznrNWOy4kUUJPV-vv__clD_rD2Ul_nUySiLRNNiubcIxwK81MgkkBsjwr0_BIkhfXFeTpgg=w1379-h919-s-no-gm?authuser=0",
-        description: "Joyau de la côte égyptienne aux portes du désert arabique. Paradis de la plongée sous-marine réputé pour ses récifs coralliens et ses eaux cristallines chaudes toute l'année. Un cadre idyllique pour observer la faune et la flore sous-marine de la mer Rouge en toute quiétude au cœur de superbes lagons.",
+        description: "Joyau de la côte égyptienne aux portes du désert arabique. Paradis de la plongée sous-marine réputé pour ses récifs coralliens et ses eaux cristallines chaudes toute l'année. Un cadre idyllique pour observer la faune et la flore sous-marine de la mer Rouge en toute quiétude au cœur de superbes lagons. La ville offre un contraste saisissant entre l'animation des souks traditionnels de Dahar, le charme touristique de Sekalla et le luxe moderne de Marina Boulevard, créant ainsi une destination balnéaire et culturelle complète pour tous les voyageurs en quête d'évasion et de découverte.",
+        visiter: "Les excursions nautiques vers l'île de Giftun constituent une option privilégiée pour l'observation des fonds marins, tandis que la découverte des récifs s'organise facilement depuis les centres spécialisés de la côte. Les spécialités culinaires locales à base de poissons frais se dégustent dans les établissements du port principal. Les édifices religieux tels que la grande mosquée Al Mina et l'église copte apportent une dimension culturelle aux promenades urbaines, et l'immensité du désert environnant se prête aux randonnées en véhicules tout-terrain sous un ciel étoilé.",
         link: "https://photos.app.goo.gl/WmQkwoGfa1tPnuex5"
       },
       {
         id: "charm_el_naga",
         name: "Charm el-Naga",
-        region: "egypte",
+        region: "Gouvernorat de la Mer-Rouge",
         country: "Égypte",
+        flag: "🇪🇬",
         category: "plage",
         counts: { plage: 1 },
         lat: 27.0250,
         lng: 33.9150,
         image: "https://lh3.googleusercontent.com/pw/AP1GczM4ecV2oWKGbD_bDkpjOGJXygG-7vPAB5pg8vehhSGDjmXvbEsBLgl1mq_Ca4hyNgW-3MaQCcw2j7AVLMu_dkwwD0f5oNA7tnUo3u31wBKwpoPwjmYa9mBom71lHlNBurZ8mVXghWFoYTwWFwcmFEW1Hg=w1225-h919-s-no-gm?authuser=0",
-        description: "Baie paradisiaque et sanctuaire naturel protégé sur la mer Rouge, célèbre pour son magnifique récif corallien accessible directement depuis la plage. Les fonds marins y regorgent de poissons multicolores et d'espèces endémiques dans un état de conservation remarquable.",
+        description: "Baie paradisiaque et sanctuaire naturel protégé sur la mer Rouge, célèbre pour son magnifique récif corallien accessible directement depuis la plage. Les fonds marins y regorgent de poissons multicolores et d'espèces endémiques dans un état de conservation remarquable. Loin de l'agitation des grandes stations balnéaires, ce site offre un havre de paix absolu pour les amoureux de nature préservée, de calme et d'exploration sous-marine en bord de rivage.",
+        visiter: "L'utilisation du masque et du tuba s'effectue directement depuis le rivage sablonneux pour observer une grande variété de poissons-perroquets, de raies et de spécimens marins protégés. Les installations de détente sur la plage permettent de profiter du panorama marin en toute tranquillité, et le restaurant panoramique offre des haltes gourmandes avec vue directe sur le rivage turquoise, dans un cadre particulièrement préservé.",
         link: "https://photos.google.com/share/AF1QipNRwK8ty9V3z_pZf-4EdBsAxQruzmu08jE2YUbNhN5qjAIvnZ-eD_YMF1h_I1jveg?key=Z19TSXNmSGNDazJoOEsxR3YyRmstR0R6aXExOWpR"
       },
       {
-  id: "assouan_elephantine",
-  name: "Assouan & Île Éléphantine",
-  region: "egypte",
-  country: "Égypte",
-  category: "archeologie",
-  counts: { archeologie: 2, musee: 1 },
-  lat: 24.0889,
-  lng: 32.8998,
-  image: "https://lh3.googleusercontent.com/pw/AP1GczMe5-tPfvBETQYNCaS7NQE82xAvrOGgrkqnWcydSwujR6xCg-Fwh_4V9telxRd-O_X4ET6aLQcybNwJBJ58KjEJyB2zoQWgIyFddWJAc_vLjj4Bdgz21o8-HsKKWdkfrUQrv8eLPr2bbmslLuhpnJts2A=w2686-h1791-s-no-gm?authuser=0",
-  description: "Porte historique de l'Égypte vers le sud, Assouan et l'île Éléphantine abritent des vestiges millénaires au milieu des eaux du Nil. Entre les temples sacrés, les nécropoles antiques et le musée de Nubie, ce site témoigne de la richesse fascinante de l'histoire pharaonique et nubienne.",
-  link: "https://photos.google.com/share/AF1QipNZfBT4M0PS4dNnwcK68X2Oia2tILgY86cyJSq9mDJ69FPcLPDkB9H4VMkFde2FiQ?key=bWVoRGE4X3E5dUxxVk81akd5Z3BtTzMtUm55aWx3"
-},
-      {
         id: "abu_simbel",
         name: "Abou Simbel",
-        region: "egypte",
+        region: "Gouvernorat d'Assouan",
         country: "Égypte",
+        flag: "🇪🇬",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 22.3372,
         lng: 31.6258,
         image: "https://lh3.googleusercontent.com/pw/AP1GczNxJ2b7wblm68J5LebZ_FRLke0MjUtjwjstgkx1Tv2k0_QEwQ0UZFSbmXelmCFdT91Fg_IXRK4KD4VfG_TGB9x825G1ENU7rXM5cipskgHi99lQ9S7gq1uyAOXpRE7fexNraWeB-fZMY6WGCpi7Qj-hyQ=w2768-h1845-s-no-gm?authuser=0",
-        description: "Chef-d'œuvre absolu de l'Égypte antique et sanctuaire monumental de Ramsès II, sauvé des eaux par une opération internationale historique de l'UNESCO. Ses colosses sculptés dans la roche dominent le lac Nasser et témoignent du génie des bâtisseurs pharaoniques à travers les millénaires.",
+        description: "Chef-d'œuvre absolu de l'Égypte antique et sanctuaire monumental de Ramsès II, sauvé des eaux par une opération internationale historique de l'UNESCO. Ses colosses sculptés dans la roche dominent le lac Nasser et témoignent du génie des bâtisseurs pharaoniques à travers les millénaires. Les façades majestueuses et les salles intérieures richement décorées de bas-reliefs racontent la grandeur militaire et divine du pharaon ainsi que son amour pour son épouse Néfertari.",
+        visiter: "Les colosses assis de Ramsès II se dressent à même la falaise de grès, tandis que les salles intérieures du grand temple révèlent des piliers osiriens et des peintures murales d'époque. Le sanctuaire voisin d'Hathor est consacré à la reine Néfertari, et le site propose des représentations en plein air mettant en valeur les façades rocheuses face aux rives calmes du lac Nasser.",
         link: "https://photos.google.com/share/AF1QipNZny40txWDRQ8Qb-LD1XNcYvUTphU0lnrL4IGXMN759ZNkxSRmNoWpmQcCU_W-8A?key=RVJiTzd4cDNfMkE1Y2d1Y3hJU1RMOEJ0T1dqODlR"
       },
       {
         id: "philae",
         name: "Temple de Philae",
-        region: "egypte",
+        region: "Gouvernorat d'Assouan",
         country: "Égypte",
+        flag: "🇪🇬",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 24.0255,
         lng: 32.8842,
         image: "https://lh3.googleusercontent.com/pw/AP1GczNEZkmSVkAOkW3xempadnM8SHkLXcN3lxMwF4P_v6HtDWRgGXZ7S5acbBjjdYQ9MysHS9TvU4gC2OHbpzOVelFEwDghH81UVzI3MSQWjvGtk5lcPhRiTUSWH-ddLkZdWe9EtrN-ULTtu5eSojGN3EmOQA=w2518-h1679-s-no-gm?authuser=0",
-        description: "Majestueux temple dédié à la déesse Isis, dressé sur une île sacrée du Nil et également sauvé des eaux par l'UNESCO lors du déplacement des monuments de Nubie. Un site imprégné de mystère et d'une beauté architecturale inouïe.",
+        description: "Majestueux temple dédié à la déesse Isis, dressé sur une île sacrée du Nil et également sauvé des eaux par l'UNESCO lors du déplacement des monuments de Nubie. Un site imprégné de mystère et d'une beauté architecturale inouïe. Ce complexe somptueux fut l'un des derniers bastions de la religion de l'ancienne Égypte, abritant des sanctuaires raffinés, des colonnades élégantes et des murs couverts d'inscriptions hiéroglyphiques remarquablement préservées au milieu des flots.",
+        visiter: "L'approche de l'île d'Agilkia s'effectue traditionnellement par les embarcations locales naviguant sur les eaux du fleuve. Le kiosque de Trajan présente des colonnades florales remarquables, la cour principale est entourée de portiques sculptés, et les sanctuaires intérieurs conservent des témoignages majeurs des cultes isiaques, le tout baigné par les reflets lumineux du fleuve.",
         link: "https://photos.google.com/share/AF1QipPVZEvhbCKZ1OsGyi7gmCW1HWWoCPJRFurTVfJyrV-AeNttAhYo3TmhJRSCkkyIdw?key=SG1iYmYyang3QVE5Sk50NDR2aGZHTEh3aXBKQ2lB"
+      },
+      {
+        id: "assouan_elephantine",
+        name: "Assouan & Île Éléphantine",
+        region: "Gouvernorat d'Assouan",
+        country: "Égypte",
+        flag: "🇪🇬",
+        category: "musee",
+        counts: { musee: 1 },
+        lat: 24.0889,
+        lng: 32.8998,
+        image: "https://lh3.googleusercontent.com/pw/AP1GczMe5-tPfvBETQYNCaS7NQE82xAvrOGgrkqnWcydSwujR6xCg-Fwh_4V9telxRd-O_X4ET6aLQcybNwJBJ58KjEJyB2zoQWgIyFddWJAc_vLjj4Bdgz21o8-HsKKWdkfrUQrv8eLPr2bbmslLuhpnJts2A=w2686-h1791-s-no-gm?authuser=0",
+        description: "Porte historique de l'Égypte vers le sud, Assouan et l'île Éléphantine abritent des vestiges millénaires au milieu des eaux du Nil. Entre les temples sacrés, les nécropoles antiques et le musée de Nubie, ce site témoigne de la richesse fascinante de l'histoire pharaonique et nubienne. L'île respire une atmosphère paisible avec ses villages nubiens aux maisons colorées, ses vergers luxuriants et ses sites archéologiques millénaires racontant le commerce et les cultes de l'ancienne frontière.",
+        visiter: "Les collections du Musée de Nubie présentent des pièces archéologiques de premier plan, tandis que les vestiges de l'ancienne cité d'Abou conservent un nilomètre antique creusé dans la roche. Les sentiers des villages nubiens offrent une immersion culturelle authentique, et les promenades fluviales en embarcation traditionnelle permettent de longer les rives rocheuses et les cataractes du Nil.",
+        link: "https://photos.google.com/share/AF1QipNZfBT4M0PS4dNnwcK68X2Oia2tILgY86cyJSq9mDJ69FPcLPDkB9H4VMkFde2FiQ?key=bWVoRGE4X3E5dUxxVk81akd5Z3BtTzMtUm55aWx3"
       }
     ];
 
@@ -326,6 +375,32 @@
     let currentSelectedSpot = null;
     let isTransitioningMode = false;
     let activeCursorCoords = { lat: 27.2579, lng: 33.8116 };
+    let isFiltersPanelOpen = true;
+
+    function toggleFiltersPanel() {
+      isFiltersPanelOpen = !isFiltersPanelOpen;
+      const panel = document.getElementById('filters-panel');
+      const btnOpen = document.getElementById('btn-open-filters');
+      if (panel && btnOpen) {
+        if (isFiltersPanelOpen) {
+          panel.style.transform = 'translateX(0)';
+          panel.style.opacity = '1';
+          panel.style.pointerEvents = 'auto';
+          panel.style.width = '';
+          panel.style.padding = '0.75rem';
+          panel.style.borderWidth = '1px';
+          btnOpen.classList.add('hidden');
+        } else {
+          panel.style.transform = 'translateX(-100%)';
+          panel.style.opacity = '0';
+          panel.style.pointerEvents = 'none';
+          panel.style.width = '0';
+          panel.style.padding = '0';
+          panel.style.borderWidth = '0';
+          btnOpen.classList.remove('hidden');
+        }
+      }
+    }
 
     function normalizeLongitude(lng) {
       return ((((lng + 180) % 360) + 360) % 360) - 180;
@@ -395,13 +470,14 @@
 
           if (d.isCluster) {
             const count = d.count;
-            const pulseScale = Math.min(4.5, 1.2 + (count * 0.35));
-            const pulseSpeed = Math.max(0.4, 2.0 - (count * 0.2));
+            const pulseScale = count > 1 ? Math.min(4.5, 1.3 + (count * 0.4)) : 1;
+            const pulseSpeed = Math.max(0.3, 1.8 - (count * 0.2));
+            const radarClass = count > 1 ? 'marker-radar-dynamic' : '';
 
             anchor.innerHTML = `
               <div class="relative flex items-center justify-center pointer-events-auto">
-                <span class="absolute w-12 h-12 rounded-full marker-radar-dynamic pointer-events-none" style="background-color: #22d3ee; --pulse-scale: ${pulseScale}; --pulse-speed: ${pulseSpeed}s;"></span>
-                <div class="relative px-3 py-1.5 rounded-full flex items-center gap-1.5 text-white font-black text-xs bg-gradient-to-r from-cyan-600 to-blue-600 border-2 border-white shadow-xl cursor-pointer transform hover:scale-125 transition">
+                <span class="absolute w-12 h-12 rounded-full ${radarClass} pointer-events-none" style="background-color: #22d3ee; --pulse-scale: ${pulseScale}; --pulse-speed: ${pulseSpeed}s;"></span>
+                <div class="relative px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-white font-black text-xs bg-gradient-to-r from-cyan-600 to-blue-600 border-2 border-white shadow-xl cursor-pointer transform hover:scale-125 transition">
                   <span>📍</span>
                   <span class="font-mono text-sm">${count}</span>
                 </div>
@@ -414,7 +490,10 @@
             return anchor;
           }
 
-          const cat = CATEGORIES[d.category] || { color: '#06b6d4', icon: 'fa-location-dot' };
+          const spot = d.spot;
+          const activeCatKey = getFirstActiveCategoryForSpot(spot);
+          const cat = CATEGORIES[activeCatKey] || CATEGORIES[spot.category] || { color: '#06b6d4', icon: 'fa-location-dot' };
+
           anchor.innerHTML = `
             <div class="relative flex items-center justify-center pointer-events-auto">
               <div class="relative w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] border-2 border-white/90 shadow-lg cursor-pointer transition hover:scale-125" style="background-color: ${cat.color}; box-shadow: 0 0 10px ${cat.color};">
@@ -424,7 +503,7 @@
           `;
           anchor.onclick = (e) => {
             e.stopPropagation();
-            selectSpot(d);
+            selectSpot(spot);
           };
           return anchor;
         });
@@ -517,7 +596,9 @@
       leafletMarkersGroup.clearLayers();
 
       getFilteredSpots().forEach(spot => {
-        const cat = CATEGORIES[spot.category] || { color: '#06b6d4', icon: 'fa-location-dot' };
+        const activeCatKey = getFirstActiveCategoryForSpot(spot);
+        const cat = CATEGORIES[activeCatKey] || CATEGORIES[spot.category] || { color: '#06b6d4', icon: 'fa-location-dot' };
+        
         const customIcon = L.divIcon({
           className: 'custom-pin',
           html: `<div style="background-color: ${cat.color}; box-shadow: 0 0 8px ${cat.color};" class="w-7 h-7 rounded-full flex items-center justify-center text-white border-2 border-white shadow-lg cursor-pointer transform hover:scale-125 transition"><i class="fa-solid ${cat.icon} text-[11px]"></i></div>`,
@@ -573,8 +654,9 @@
         let altitude = targetCoords && targetCoords.altitude ? targetCoords.altitude : 2.1;
 
         mapView.classList.replace('opacity-100', 'opacity-0');
-        mapView.classList.replace('pointer-events-auto', 'pointer-events-none');
+        mapView.classList.replace('pointer-events-none', 'pointer-events-auto');
         globeView.classList.replace('opacity-0', 'opacity-100');
+        globeView.classList.replace('opacity-100', 'opacity-100');
         globeView.classList.replace('pointer-events-none', 'pointer-events-auto');
 
         btnGlobe.classList.add('bg-cyan-500', 'text-white', 'shadow');
@@ -603,13 +685,18 @@
     function selectSpot(spot) {
       currentSelectedSpot = spot;
       const card = document.getElementById('destination-card');
+      const flagEl = document.getElementById('card-flag');
+      const regionEl = document.getElementById('card-country-region');
       const img = document.getElementById('card-img');
       const tagsContainer = document.getElementById('card-photo-tags');
       const title = document.getElementById('card-title');
       const location = document.getElementById('card-location');
       const desc = document.getElementById('card-description');
+      const visiter = document.getElementById('card-visiter');
       const link = document.getElementById('card-link');
 
+      flagEl.innerText = spot.flag || '📍';
+      regionEl.innerText = `${spot.country} · ${spot.region || 'Région non spécifiée'}`;
       img.src = spot.image;
       tagsContainer.innerHTML = '';
 
@@ -623,7 +710,6 @@
         spotCategories.push(spot.category);
       }
 
-      // Affichage des cartouches d'étiquettes dans l'espace situé sous l'image
       spotCategories.forEach(catKey => {
         const cat = CATEGORIES[catKey];
         if (!cat) return;
@@ -635,8 +721,9 @@
       });
 
       title.innerText = spot.name;
-      location.querySelector('span').innerText = `${spot.country} · ${spot.lat.toFixed(4)}°N, ${spot.lng.toFixed(4)}°E`;
+      location.querySelector('span').innerText = `${spot.lat.toFixed(4)}°N, ${spot.lng.toFixed(4)}°E`;
       desc.innerText = spot.description;
+      visiter.innerText = spot.visiter || "Aucun détail complémentaire renseigné pour ce site.";
       link.href = spot.link;
 
       updateSpotToggleButton();
@@ -676,7 +763,7 @@
         btnLabel.innerText = "Explorer en 2D";
       } else {
         btnIcon.className = "fa-solid fa-globe text-cyan-400 text-[10px]";
-        btnLabel.innerText = "Observer en 3D (Retour globe)";
+        btnLabel.innerText = "Observer en 3D";
       }
     }
 
@@ -693,17 +780,43 @@
       setViewingMode('globe', { lat: 27.2579, lng: 33.8116, altitude: 2.1 });
     }
 
+    function spotMatchesActiveFilters(spot) {
+      let matched = false;
+      if (spot.counts) {
+        Object.keys(spot.counts).forEach(catKey => {
+          if (CATEGORIES[catKey] && CATEGORIES[catKey].active) {
+            matched = true;
+          }
+        });
+      }
+      if (!matched && spot.category && CATEGORIES[spot.category] && CATEGORIES[spot.category].active) {
+        matched = true;
+      }
+      return matched;
+    }
+
+    function getFirstActiveCategoryForSpot(spot) {
+      if (spot.counts) {
+        for (let catKey of Object.keys(spot.counts)) {
+          if (CATEGORIES[catKey] && CATEGORIES[catKey].active) {
+            return catKey;
+          }
+        }
+      }
+      if (spot.category && CATEGORIES[spot.category] && CATEGORIES[spot.category].active) {
+        return spot.category;
+      }
+      return spot.category;
+    }
+
     function getFilteredSpots() {
-      return travelSpots.filter(spot => {
-        const cat = CATEGORIES[spot.category];
-        return cat ? cat.active : true;
-      });
+      return travelSpots.filter(spot => spotMatchesActiveFilters(spot));
     }
 
     function updateGlobeDisplay() {
       if (!myGlobe) return;
       
-      const spots = getFilteredSpots();
+      const filteredSpots = getFilteredSpots();
       const pov = myGlobe.pointOfView();
       const clusterMap = new Map();
       const finalElements = [];
@@ -711,7 +824,7 @@
       const shouldCluster = pov && pov.altitude > 0.35;
 
       if (shouldCluster) {
-        spots.forEach(spot => {
+        filteredSpots.forEach(spot => {
           const key = `${Math.round(spot.lat * 1.5)},${Math.round(spot.lng * 1.5)}`;
           if (!clusterMap.has(key)) {
             clusterMap.set(key, []);
@@ -731,19 +844,19 @@
               spots: group
             });
           } else {
-            finalElements.push(group[0]);
+            finalElements.push({ spot: group[0], lat: group[0].lat, lng: group[0].lng });
           }
         });
       } else {
-        spots.forEach(s => finalElements.push(s));
+        filteredSpots.forEach(spot => finalElements.push({ spot: spot, lat: spot.lat, lng: spot.lng }));
       }
 
       myGlobe.htmlElementsData(finalElements);
       updateStats();
     }
 
-    function renderCategoryToggles() {
-      const container = document.getElementById('category-toggles');
+    function renderUnifiedCategoryList() {
+      const container = document.getElementById('unified-category-list');
       if (!container) return;
       container.innerHTML = '';
 
@@ -756,83 +869,19 @@
           lastSection = cat.section;
           if (container.children.length > 0) {
             const sep = document.createElement('div');
-            sep.className = 'w-full h-[1px] bg-slate-700/80 my-2.5';
+            sep.className = 'w-full h-[1px] bg-slate-700/80 my-2';
             container.appendChild(sep);
           }
           const sectionHeader = document.createElement('div');
-          sectionHeader.className = 'pb-1 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 px-2 py-1 rounded';
+          sectionHeader.className = 'text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 px-2.5 py-1 rounded';
           if (lastSection === 'culture') {
             sectionHeader.className += ' text-amber-500 bg-amber-950/50 border border-amber-600/30';
-            sectionHeader.innerHTML = '<i class="fa-solid fa-landmark"></i> Culture & Patrimoine';
+            sectionHeader.innerHTML = '<i class="fa-solid fa-landmark"></i> Culture';
           } else {
             sectionHeader.className += ' text-cyan-400 bg-cyan-950/50 border border-cyan-600/30';
-            sectionHeader.innerHTML = '<i class="fa-solid fa-water"></i> Nature & Eau';
+            sectionHeader.innerHTML = '<i class="fa-solid fa-water"></i> Nature';
           }
           container.appendChild(sectionHeader);
-        }
-
-        const row = document.createElement('label');
-        row.className = 'flex items-center justify-between p-1.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 cursor-pointer transition select-none border border-slate-800/60';
-        row.innerHTML = `
-          <div class="flex items-center gap-2">
-            <input type="checkbox" ${cat.active ? 'checked' : ''} onchange="toggleCategory('${key}')" class="w-3.5 h-3.5 rounded text-cyan-500 bg-slate-800 border-slate-700 focus:ring-0 cursor-pointer">
-            <span class="w-2 h-2 rounded-full" style="background-color: ${cat.color}"></span>
-            <span class="text-slate-200 text-[11px] font-medium truncate">${cat.label}</span>
-          </div>
-          <i class="fa-solid ${cat.icon} text-slate-400 text-[10px]"></i>
-        `;
-        container.appendChild(row);
-      });
-    }
-
-    function toggleCategory(key) {
-      if (CATEGORIES[key]) {
-        CATEGORIES[key].active = !CATEGORIES[key].active;
-        updateGlobeDisplay();
-        updateLeafletDisplay();
-      }
-    }
-
-    function setAllFilters(state) {
-      Object.keys(CATEGORIES).forEach(k => {
-        CATEGORIES[k].active = state;
-      });
-      renderCategoryToggles();
-      updateGlobeDisplay();
-      updateLeafletDisplay();
-    }
-
-    function updateStats() {
-      let totalSites = travelSpots.length;
-      const totalEl = document.getElementById('stat-total');
-      if (totalEl) totalEl.innerText = totalSites;
-
-      const narrowContainer = document.getElementById('narrow-hud-list');
-      if (!narrowContainer) return;
-      narrowContainer.innerHTML = '';
-
-      let lastSection = null;
-
-      Object.keys(CATEGORIES).forEach(key => {
-        const cat = CATEGORIES[key];
-
-        if (cat.section !== lastSection) {
-          lastSection = cat.section;
-          if (narrowContainer.children.length > 0) {
-            const sep = document.createElement('div');
-            sep.className = 'w-10 h-[1px] bg-cyan-500/30 my-2';
-            narrowContainer.appendChild(sep);
-          }
-          const miniHeader = document.createElement('div');
-          miniHeader.className = 'w-full text-center py-1 text-[9px] font-bold rounded';
-          if (lastSection === 'culture') {
-            miniHeader.className += ' text-amber-400 bg-amber-950/60 border border-amber-600/30';
-            miniHeader.innerHTML = '<i class="fa-solid fa-landmark"></i>';
-          } else {
-            miniHeader.className += ' text-cyan-400 bg-cyan-950/60 border border-cyan-600/30';
-            miniHeader.innerHTML = '<i class="fa-solid fa-water"></i>';
-          }
-          narrowContainer.appendChild(miniHeader);
         }
 
         let count = 0;
@@ -844,17 +893,49 @@
           }
         });
 
-        const item = document.createElement('div');
-        item.className = 'flex items-center justify-between w-full px-1 py-1 rounded-lg bg-slate-900/70 border border-slate-800/70';
-        item.title = `${cat.label} : ${count}`;
-        item.innerHTML = `
-          <div class="w-5 h-5 rounded-md flex items-center justify-center text-[10px]" style="background-color: ${cat.color}25; color: ${cat.color}">
-            <i class="fa-solid ${cat.icon}"></i>
+        const row = document.createElement('label');
+        row.className = 'flex items-center justify-between p-1.5 rounded-lg bg-slate-900/60 hover:bg-slate-800/80 cursor-pointer transition select-none border border-slate-800/60';
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <input type="checkbox" ${cat.active ? 'checked' : ''} onchange="toggleCategory('${key}')" class="w-3.5 h-3.5 rounded text-cyan-500 bg-slate-800 border-slate-700 focus:ring-0 cursor-pointer">
+            <div class="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] shrink-0 shadow" style="background-color: ${cat.color};">
+              <i class="fa-solid ${cat.icon}"></i>
+            </div>
+            <span class="text-slate-200 text-[11px] font-medium truncate">${cat.label}</span>
           </div>
-          <span class="font-mono font-bold text-[11px] ${count > 0 ? 'text-white' : 'text-slate-500'}">${count}</span>
+          <span class="font-mono font-bold text-[10px] px-1.5 py-0.5 rounded bg-slate-950/60 border border-slate-800 ${count > 0 ? 'text-white' : 'text-slate-500'}">${count}</span>
         `;
-        narrowContainer.appendChild(item);
+        container.appendChild(row);
       });
+    }
+
+    function toggleCategory(key) {
+      if (CATEGORIES[key]) {
+        CATEGORIES[key].active = !CATEGORIES[key].active;
+        updateGlobeDisplay();
+        updateLeafletDisplay();
+        updateStats();
+      }
+    }
+
+    function setAllFilters(state) {
+      Object.keys(CATEGORIES).forEach(k => {
+        CATEGORIES[k].active = state;
+      });
+      renderUnifiedCategoryList();
+      updateGlobeDisplay();
+      updateLeafletDisplay();
+      updateStats();
+    }
+
+    function updateStats() {
+      let totalSites = travelSpots.length;
+      const statSitesEl = document.getElementById('header-stat-sites');
+      if (statSitesEl) statSitesEl.innerText = totalSites;
+
+      const uniqueCountries = new Set(travelSpots.map(s => s.country)).size;
+      const statCountriesEl = document.getElementById('header-stat-countries');
+      if (statCountriesEl) statCountriesEl.innerText = uniqueCountries;
     }
 
     function zoomMapIn() {
@@ -922,7 +1003,7 @@
     window.addEventListener('resize', onWindowResize);
     window.onload = function () {
       initGlobe();
-      renderCategoryToggles();
+      renderUnifiedCategoryList();
       updateStats();
       setTimeout(onWindowResize, 200);
     };
