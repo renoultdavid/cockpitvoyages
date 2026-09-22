@@ -642,6 +642,7 @@
       controls.maxDistance = 1200;
       controls.enabled = true;
 
+      // Arrêt automatique du calcul au repos : évite de faire tourner le processeur quand on ne manipule rien
       controls.addEventListener('start', () => {
         if (isAutoRotating) {
           controls.autoRotate = false;
@@ -960,19 +961,32 @@
       const pov = myGlobe.pointOfView();
       const altitude = (pov && typeof pov.altitude === 'number' && !isNaN(pov.altitude)) ? pov.altitude : 2.0;
 
-      // En vue rapprochée (< 0.45 d'altitude), aucun regroupement : affichage unitaire immédiat
+      // CULLING DE L'HÉMISPHÈRE CACHÉ : On exclut immédiatement les points situés derrière la planète
+      // Cela évite au navigateur de calculer et positionner des éléments HTML invisibles
+      const visibleSpots = filteredSpots.filter(spot => {
+        // Distance angulaire par rapport au centre de vue de la caméra
+        const dLat = (spot.lat - (pov.lat || 0)) * Math.PI / 180;
+        const dLng = (spot.lng - (pov.lng || 0)) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos((pov.lat || 0) * Math.PI / 180) * Math.cos(spot.lat * Math.PI / 180) *
+                  Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        // L'hémisphère visible représente un angle d'environ 85 à 90 degrés selon l'altitude
+        return c < (Math.PI / 2 + 0.1);
+      });
+
+      // En vue rapprochée (< 0.45 d'altitude), affichage unitaire des points visibles
       if (altitude <= 0.45) {
-        myGlobe.htmlElementsData(filteredSpots.map(spot => ({ spot, lat: spot.lat, lng: spot.lng })));
+        myGlobe.htmlElementsData(visibleSpots.map(spot => ({ spot, lat: spot.lat, lng: spot.lng })));
         updateStats();
         return;
       }
 
-      // En vue éloignée : le rayon angulaire s'élargit progressivement.
-      // À altitude globale (>= 1.6), le seuil de 25° regroupe immédiatement tous les sites en 1 cluster unique
+      // En vue éloignée : regroupement dynamique selon la distance
       const clusterThresholdDeg = altitude >= 1.6 ? 26 : Math.max(1.8, (altitude - 0.3) * 11);
       const clusters = [];
 
-      filteredSpots.forEach(spot => {
+      visibleSpots.forEach(spot => {
         let placedInCluster = false;
         for (let cluster of clusters) {
           const dLat = Math.abs(cluster.centerLat - spot.lat);
