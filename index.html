@@ -17,8 +17,8 @@
 
   <!-- Leaflet MarkerCluster -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/1.5.3/leaflet.markercluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 
   <!-- Globe.gl 3D -->
   <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js"></script>
@@ -54,12 +54,20 @@
       justify-content: center;
     }
 
-    @keyframes radar-pulse {
+    @keyframes radar-pulse-dynamic {
       0% { transform: scale(0.6); opacity: 0.9; }
-      100% { transform: scale(2.4); opacity: 0; }
+      100% { transform: scale(var(--pulse-scale, 2.5)); opacity: 0; }
     }
-    .marker-radar {
-      animation: radar-pulse 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    .marker-radar-dynamic {
+      animation: radar-pulse-dynamic var(--pulse-speed, 2s) cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes counter-pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(34, 211, 238, 0); }
+      50% { transform: scale(1.04); box-shadow: 0 0 14px rgba(34, 211, 238, 0.5); }
+    }
+    .counter-pulse-anim {
+      animation: counter-pulse 2.5s ease-in-out infinite;
     }
 
     .custom-cluster-icon {
@@ -81,26 +89,22 @@
 </head>
 <body class="relative w-full h-full bg-slate-950 font-sans antialiased text-slate-100 overflow-hidden">
 
-  <!-- 3D Globe Viewport -->
+  <!-- VUE GLOBE 3D -->
   <div id="globe-view" class="absolute inset-0 w-full h-full z-0 transition-opacity duration-500 opacity-100 pointer-events-auto">
     <div id="globe-container" class="w-full h-full"></div>
     <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
-      <div class="relative w-10 h-10 rounded-full border border-cyan-400/25 flex items-center justify-center opacity-30">
+      <div id="aim-reticle" class="relative w-10 h-10 rounded-full border border-cyan-400/25 flex items-center justify-center opacity-30">
         <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></div>
-        <div class="absolute -top-1.5 w-0.5 h-1.5 bg-cyan-400/50"></div>
-        <div class="absolute -bottom-1.5 w-0.5 h-1.5 bg-cyan-400/50"></div>
-        <div class="absolute -left-1.5 w-1.5 h-0.5 bg-cyan-400/50"></div>
-        <div class="absolute -right-1.5 w-1.5 h-0.5 bg-cyan-400/50"></div>
       </div>
     </div>
   </div>
 
-  <!-- 2D Leaflet Viewport -->
+  <!-- VUE CARTE 2D HD -->
   <div id="map-view" class="absolute inset-0 w-full h-full z-0 transition-opacity duration-500 opacity-0 pointer-events-none bg-slate-950">
     <div id="leaflet-container" class="w-full h-full"></div>
   </div>
 
-  <!-- Top Header Navigation & Mode Switchers -->
+  <!-- EN-TÊTE & COMMANDES HAUT -->
   <header class="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
     <div class="flex items-center gap-2 pointer-events-auto">
       <div class="glass-panel px-3 py-2 rounded-2xl flex items-center gap-2.5">
@@ -115,19 +119,27 @@
         </div>
       </div>
 
+      <!-- Bascule Globe 3D / Carte HD -->
       <div class="glass-panel p-1 rounded-2xl flex items-center shadow-lg">
         <button id="btn-mode-globe" onclick="setViewingMode('globe')" class="px-3 py-1 rounded-xl text-xs font-semibold transition-all duration-200 bg-cyan-500 text-white shadow">
           <i class="fa-solid fa-globe mr-1"></i> 3D
         </button>
-        <button id="btn-mode-map" onclick="setViewingMode('map')" class="px-3 py-1 rounded-xl text-xs font-semibold transition-all duration-200 text-slate-300 hover:text-white">
+        <button id="btn-mode-map" onclick="triggerManualMapSwitch()" class="px-3 py-1 rounded-xl text-xs font-semibold transition-all duration-200 text-slate-300 hover:text-white">
           <i class="fa-solid fa-map mr-1"></i> Carte HD
         </button>
       </div>
     </div>
 
+    <!-- Saut Rapide -->
     <div class="flex items-center gap-1.5 pointer-events-auto glass-panel px-2.5 py-1.5 rounded-2xl">
       <button onclick="flyToSpotCoordinates(27.2579, 33.8116, 12)" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-cyan-500/25 hover:bg-cyan-500/35 text-cyan-300 border border-cyan-500/40 transition flex items-center gap-1">
-        <span>🐠</span> Égypte (Mer Rouge)
+        <span>🐠</span> Hurghada
+      </button>
+      <button onclick="flyToSpotCoordinates(22.3372, 31.6258, 11)" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-500/25 hover:bg-amber-500/35 text-amber-300 border border-amber-500/40 transition flex items-center gap-1">
+        <span>🏛️</span> Abou Simbel
+      </button>
+      <button onclick="flyToSpotCoordinates(24.0255, 32.8842, 12)" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-600/25 hover:bg-amber-600/35 text-amber-200 border border-amber-500/40 transition flex items-center gap-1">
+        <span>⛩️</span> Philae
       </button>
       <button onclick="resetGlobalView()" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1" title="Vue globale planète 3D">
         <i class="fa-solid fa-globe"></i> Globe
@@ -135,7 +147,7 @@
     </div>
   </header>
 
-  <!-- Left Sidebar: Filters with Section Headers & Select All / None -->
+  <!-- PANNEAU FILTRES GAUCHE -->
   <aside id="left-filters" class="absolute top-16 left-3 z-30 flex flex-col gap-2 w-56 sm:w-60 pointer-events-auto max-h-[calc(100vh-6rem)] overflow-y-auto no-scrollbar">
     <div class="glass-panel rounded-2xl p-3 shadow-2xl">
       <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-700/60">
@@ -153,40 +165,44 @@
     </div>
   </aside>
 
-  <!-- Right Narrow HUD: Vertical Tall Counters with Section Dividers -->
+  <!-- COMPTEUR ULTRA-ÉTROIT DROITE -->
   <aside id="right-narrow-hud" class="absolute top-16 right-3 z-30 flex flex-col items-end pointer-events-auto w-16">
     <div class="glass-panel rounded-2xl py-2 px-2 shadow-2xl flex flex-col items-center gap-1.5 max-h-[calc(100vh-6rem)] overflow-y-auto no-scrollbar border-slate-700/60 w-16">
-      <div class="w-full py-1.5 rounded-xl bg-cyan-950/80 border border-cyan-500/40 flex flex-col items-center justify-center text-center shadow-inner" title="Total des sites visités">
+      <div class="w-full py-1.5 rounded-xl bg-cyan-950/80 border border-cyan-500/40 flex flex-col items-center justify-center text-center shadow-inner relative overflow-hidden counter-pulse-anim" title="Total des sites visités">
+        <span class="absolute inset-0 bg-cyan-400/10 pointer-events-none"></span>
         <i class="fa-solid fa-map-pin text-cyan-400 text-[11px] mb-0.5"></i>
-        <span id="stat-total" class="font-mono font-black text-cyan-300 text-xs leading-none">0</span>
+        <span id="stat-total" class="font-mono font-black text-cyan-300 text-xs leading-none relative z-10">0</span>
       </div>
       <div class="w-8 h-[1px] bg-slate-700/60 my-0.5"></div>
       <div id="narrow-hud-list" class="flex flex-col gap-1 w-full items-center"></div>
     </div>
   </aside>
 
-  <!-- Independent Floating Destination Card (Bottom Right, Separated from Sidebar) -->
-  <section id="destination-card" class="absolute bottom-4 right-20 z-40 glass-panel rounded-2xl p-3 shadow-2xl border-cyan-500/40 hidden pointer-events-auto transition-all duration-300 w-80 sm:w-96 flex flex-col justify-between">
-    <div class="relative flex flex-col gap-2.5">
+  <!-- CARTE INFO DESTINATION (FLOTTANTE DROITE SOUS HUD) -->
+  <section id="destination-card" class="absolute top-44 right-20 z-40 glass-panel rounded-2xl p-4 shadow-2xl border-cyan-500/40 hidden pointer-events-auto transition-all duration-300 w-96 sm:w-[440px] flex flex-col justify-between">
+    <div class="relative flex flex-col gap-3">
       <button onclick="closeSpotCard()" class="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-xs transition z-10 border border-slate-700">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <div class="w-full h-36 rounded-xl overflow-hidden bg-slate-900 shrink-0 relative border border-slate-700/50">
+      <div class="w-full h-44 rounded-xl overflow-hidden bg-slate-900 shrink-0 relative border border-slate-700/50">
         <img id="card-img" src="" alt="Aperçu destination" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x200/0f172a/38bdf8?text=Voyage'">
-        <div id="card-badge" class="absolute bottom-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-md"></div>
       </div>
 
-      <div>
-        <h3 id="card-title" class="text-xs sm:text-sm font-bold text-white pr-4"></h3>
+      <div class="flex flex-col gap-1">
+        <!-- Espace dédié entre l'image et le titre pour les cartouches d'étiquettes -->
+        <div id="card-photo-tags" class="flex flex-wrap items-center gap-1.5 mb-1"></div>
+
+        <h3 id="card-title" class="text-sm font-bold text-white pr-4"></h3>
         <p id="card-location" class="text-[10px] text-cyan-400 font-medium flex items-center gap-1 mt-0.5">
           <i class="fa-solid fa-location-dot"></i> <span></span>
         </p>
-        <p id="card-description" class="text-[11px] text-slate-300 leading-tight my-2"></p>
+        <!-- Description calibrée à 6-7 lignes minimum -->
+        <p id="card-description" class="text-[11px] text-slate-300 leading-relaxed my-2 line-clamp-7 h-[105px] overflow-hidden"></p>
       </div>
     </div>
 
-    <div class="flex flex-col gap-2 pt-2 border-t border-slate-700/60 mt-auto">
+    <div class="flex flex-col gap-2 pt-2.5 border-t border-slate-700/60 mt-auto">
       <a id="card-link" href="#" target="_blank" rel="noopener noreferrer" class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-[11px] font-semibold flex items-center justify-center gap-1.5 shadow-md shadow-cyan-500/20 transition">
         <i class="fa-solid fa-images text-[10px]"></i>
         <span>Voir l'album photo</span>
@@ -199,7 +215,7 @@
     </div>
   </section>
 
-  <!-- Bottom Left Interactive Controls -->
+  <!-- CONTRÔLES BAS GAUCHE -->
   <div class="absolute bottom-4 left-3 z-30 flex flex-col gap-1.5 pointer-events-auto">
     <button id="btn-toggle-tiles" onclick="toggleMapTileLayer()" class="glass-panel w-9 h-9 rounded-xl flex items-center justify-center text-cyan-300 hover:text-white transition shadow-lg hidden" title="Basculer Satellite / Topo">
       <i class="fa-solid fa-layer-group text-xs"></i>
@@ -227,7 +243,7 @@
         lat: 27.2579,
         lng: 33.8116,
         image: "https://lh3.googleusercontent.com/pw/AP1GczPVx1_9UPwnhcWOyxckSpIvYC2T7xDRFTOGeQEiu82QKFht2G6YoXd-HB0DbIDdJ4ebV00ThDFY_RWXl7IznrNWOy4kUUJPV-vv__clD_rD2Ul_nUySiLRNNiubcIxwK81MgkkBsjwr0_BIkhfXFeTpgg=w1379-h919-s-no-gm?authuser=0",
-        description: "Joyau de la côte égyptienne aux portes du désert arabique. Paradis de la plongée sous-marine réputé pour ses récifs coralliens.",
+        description: "Joyau de la côte égyptienne aux portes du désert arabique. Paradis de la plongée sous-marine réputé pour ses récifs coralliens et ses eaux cristallines chaudes toute l'année. Un cadre idyllique pour observer la faune et la flore sous-marine de la mer Rouge en toute quiétude au cœur de superbes lagons.",
         link: "https://photos.app.goo.gl/WmQkwoGfa1tPnuex5"
       },
       {
@@ -240,20 +256,58 @@
         lat: 27.0250,
         lng: 33.9150,
         image: "https://lh3.googleusercontent.com/pw/AP1GczM4ecV2oWKGbD_bDkpjOGJXygG-7vPAB5pg8vehhSGDjmXvbEsBLgl1mq_Ca4hyNgW-3MaQCcw2j7AVLMu_dkwwD0f5oNA7tnUo3u31wBKwpoPwjmYa9mBom71lHlNBurZ8mVXghWFoYTwWFwcmFEW1Hg=w1225-h919-s-no-gm?authuser=0",
-        description: "Baie paradisiaque et sanctuaire naturel protégé sur la mer Rouge, célèbre pour son magnifique récif corallien.",
+        description: "Baie paradisiaque et sanctuaire naturel protégé sur la mer Rouge, célèbre pour son magnifique récif corallien accessible directement depuis la plage. Les fonds marins y regorgent de poissons multicolores et d'espèces endémiques dans un état de conservation remarquable.",
         link: "https://photos.google.com/share/AF1QipNRwK8ty9V3z_pZf-4EdBsAxQruzmu08jE2YUbNhN5qjAIvnZ-eD_YMF1h_I1jveg?key=Z19TSXNmSGNDazJoOEsxR3YyRmstR0R6aXExOWpR"
+      },
+      {
+  id: "assouan_elephantine",
+  name: "Assouan & Île Éléphantine",
+  region: "egypte",
+  country: "Égypte",
+  category: "archeologie",
+  counts: { archeologie: 2, musee: 1 },
+  lat: 24.0889,
+  lng: 32.8998,
+  image: "https://lh3.googleusercontent.com/pw/AP1GczMe5-tPfvBETQYNCaS7NQE82xAvrOGgrkqnWcydSwujR6xCg-Fwh_4V9telxRd-O_X4ET6aLQcybNwJBJ58KjEJyB2zoQWgIyFddWJAc_vLjj4Bdgz21o8-HsKKWdkfrUQrv8eLPr2bbmslLuhpnJts2A=w2686-h1791-s-no-gm?authuser=0",
+  description: "Porte historique de l'Égypte vers le sud, Assouan et l'île Éléphantine abritent des vestiges millénaires au milieu des eaux du Nil. Entre les temples sacrés, les nécropoles antiques et le musée de Nubie, ce site témoigne de la richesse fascinante de l'histoire pharaonique et nubienne.",
+  link: "https://photos.google.com/share/AF1QipNZfBT4M0PS4dNnwcK68X2Oia2tILgY86cyJSq9mDJ69FPcLPDkB9H4VMkFde2FiQ?key=bWVoRGE4X3E5dUxxVk81akd5Z3BtTzMtUm55aWx3"
+},
+      {
+        id: "abu_simbel",
+        name: "Abou Simbel",
+        region: "egypte",
+        country: "Égypte",
+        category: "archeologie",
+        counts: { archeologie: 1, unesco: 1 },
+        lat: 22.3372,
+        lng: 31.6258,
+        image: "https://lh3.googleusercontent.com/pw/AP1GczNxJ2b7wblm68J5LebZ_FRLke0MjUtjwjstgkx1Tv2k0_QEwQ0UZFSbmXelmCFdT91Fg_IXRK4KD4VfG_TGB9x825G1ENU7rXM5cipskgHi99lQ9S7gq1uyAOXpRE7fexNraWeB-fZMY6WGCpi7Qj-hyQ=w2768-h1845-s-no-gm?authuser=0",
+        description: "Chef-d'œuvre absolu de l'Égypte antique et sanctuaire monumental de Ramsès II, sauvé des eaux par une opération internationale historique de l'UNESCO. Ses colosses sculptés dans la roche dominent le lac Nasser et témoignent du génie des bâtisseurs pharaoniques à travers les millénaires.",
+        link: "https://photos.google.com/share/AF1QipNZny40txWDRQ8Qb-LD1XNcYvUTphU0lnrL4IGXMN759ZNkxSRmNoWpmQcCU_W-8A?key=RVJiTzd4cDNfMkE1Y2d1Y3hJU1RMOEJ0T1dqODlR"
+      },
+      {
+        id: "philae",
+        name: "Temple de Philae",
+        region: "egypte",
+        country: "Égypte",
+        category: "archeologie",
+        counts: { archeologie: 1, unesco: 1 },
+        lat: 24.0255,
+        lng: 32.8842,
+        image: "https://lh3.googleusercontent.com/pw/AP1GczNEZkmSVkAOkW3xempadnM8SHkLXcN3lxMwF4P_v6HtDWRgGXZ7S5acbBjjdYQ9MysHS9TvU4gC2OHbpzOVelFEwDghH81UVzI3MSQWjvGtk5lcPhRiTUSWH-ddLkZdWe9EtrN-ULTtu5eSojGN3EmOQA=w2518-h1679-s-no-gm?authuser=0",
+        description: "Majestueux temple dédié à la déesse Isis, dressé sur une île sacrée du Nil et également sauvé des eaux par l'UNESCO lors du déplacement des monuments de Nubie. Un site imprégné de mystère et d'une beauté architecturale inouïe.",
+        link: "https://photos.google.com/share/AF1QipPVZEvhbCKZ1OsGyi7gmCW1HWWoCPJRFurTVfJyrV-AeNttAhYo3TmhJRSCkkyIdw?key=SG1iYmYyang3QVE5Sk50NDR2aGZHTEh3aXBKQ2lB"
       }
     ];
 
     const CATEGORIES = {
-      // CULTURE & PATRIMOINE
       musee: { label: "Musée", icon: "fa-landmark", color: "#a16207", section: "culture", active: true },
       religieux: { label: "Édifice religieux", icon: "fa-church", color: "#854d0e", section: "culture", active: true },
       chateau: { label: "Château / Palais", icon: "fa-chess-rook", color: "#713f12", section: "culture", active: true },
       archeologie: { label: "Site archéologique", icon: "fa-monument", color: "#78350f", section: "culture", active: true },
       unesco: { label: "Site UNESCO", icon: "fa-award", color: "#b45309", section: "culture", active: true },
       megalithe: { label: "Mégalithe", icon: "fa-archway", color: "#57534e", section: "culture", active: true },
-      // NATURE & EAU
+
       cascade: { label: "Cascade", icon: "fa-water", color: "#0284c7", section: "nature", active: true },
       lac: { label: "Lac", icon: "fa-droplet", color: "#0ea5e9", section: "nature", active: true },
       plage: { label: "Plage / Plongée", icon: "fa-umbrella-beach", color: "#06b6d4", section: "nature", active: true },
@@ -270,11 +324,29 @@
     let activeTileLayerKey = 'satellite';
     let isAutoRotating = true;
     let currentSelectedSpot = null;
-    let isZoomSwitching = false;
+    let isTransitioningMode = false;
     let activeCursorCoords = { lat: 27.2579, lng: 33.8116 };
 
     function normalizeLongitude(lng) {
       return ((((lng + 180) % 360) + 360) % 360) - 180;
+    }
+
+    function getExactGlobeCenterCoords() {
+      if (!myGlobe) return { lat: 27.2579, lng: 33.8116 };
+      if (currentSelectedSpot) {
+        return { lat: currentSelectedSpot.lat, lng: currentSelectedSpot.lng };
+      }
+      const container = document.getElementById('globe-container');
+      const width = container ? container.clientWidth : window.innerWidth;
+      const height = container ? container.clientHeight : window.innerHeight;
+      if (typeof myGlobe.toGlobeCoords === 'function') {
+        const centerCoords = myGlobe.toGlobeCoords(width / 2, height / 2);
+        if (centerCoords && !isNaN(centerCoords.lat) && !isNaN(centerCoords.lng)) {
+          return { lat: Math.max(-85, Math.min(85, centerCoords.lat)), lng: normalizeLongitude(centerCoords.lng) };
+        }
+      }
+      const pov = myGlobe.pointOfView();
+      return { lat: Math.max(-85, Math.min(85, pov.lat || 0)), lng: normalizeLongitude(pov.lng || 0) };
     }
 
     const TILE_LAYERS = {
@@ -292,12 +364,13 @@
     let currentTileLayerInstance = null;
 
     function checkContinuousGlobeZoom() {
-      if (currentMode !== 'globe' || !myGlobe || isZoomSwitching) return;
+      if (currentMode !== 'globe' || !myGlobe || isTransitioningMode) return;
       const pov = myGlobe.pointOfView();
       if (pov && pov.altitude <= 0.26) {
-        isZoomSwitching = true;
-        setViewingMode('map', activeCursorCoords, 9);
-        setTimeout(() => { isZoomSwitching = false; }, 800);
+        isTransitioningMode = true;
+        const target = activeCursorCoords || getExactGlobeCenterCoords();
+        setViewingMode('map', target, 9);
+        setTimeout(() => { isTransitioningMode = false; }, 1000);
       }
     }
 
@@ -321,12 +394,16 @@
           anchor.className = 'globe-marker-anchor';
 
           if (d.isCluster) {
+            const count = d.count;
+            const pulseScale = Math.min(4.5, 1.2 + (count * 0.35));
+            const pulseSpeed = Math.max(0.4, 2.0 - (count * 0.2));
+
             anchor.innerHTML = `
               <div class="relative flex items-center justify-center pointer-events-auto">
-                <span class="absolute w-8 h-8 rounded-full marker-radar pointer-events-none" style="background-color: #22d3ee;"></span>
-                <div class="relative px-2 py-0.5 rounded-full flex items-center gap-1 text-white font-black text-[11px] bg-gradient-to-r from-cyan-600 to-blue-600 border border-white shadow-lg cursor-pointer transform hover:scale-125 transition">
+                <span class="absolute w-12 h-12 rounded-full marker-radar-dynamic pointer-events-none" style="background-color: #22d3ee; --pulse-scale: ${pulseScale}; --pulse-speed: ${pulseSpeed}s;"></span>
+                <div class="relative px-3 py-1.5 rounded-full flex items-center gap-1.5 text-white font-black text-xs bg-gradient-to-r from-cyan-600 to-blue-600 border-2 border-white shadow-xl cursor-pointer transform hover:scale-125 transition">
                   <span>📍</span>
-                  <span class="font-mono">${d.count}</span>
+                  <span class="font-mono text-sm">${count}</span>
                 </div>
               </div>
             `;
@@ -340,8 +417,7 @@
           const cat = CATEGORIES[d.category] || { color: '#06b6d4', icon: 'fa-location-dot' };
           anchor.innerHTML = `
             <div class="relative flex items-center justify-center pointer-events-auto">
-              <span class="absolute w-7 h-7 rounded-full marker-radar pointer-events-none" style="background-color: ${cat.color};"></span>
-              <div class="relative w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] border-2 border-white/90 shadow-lg cursor-pointer transition hover:scale-125" style="background-color: ${cat.color}; box-shadow: 0 0 8px ${cat.color};">
+              <div class="relative w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] border-2 border-white/90 shadow-lg cursor-pointer transition hover:scale-125" style="background-color: ${cat.color}; box-shadow: 0 0 10px ${cat.color};">
                 <i class="fa-solid ${cat.icon}"></i>
               </div>
             </div>
@@ -384,11 +460,6 @@
       controls.addEventListener('change', checkContinuousGlobeZoom);
       container.addEventListener('wheel', () => setTimeout(checkContinuousGlobeZoom, 50), { passive: true });
 
-      container.addEventListener('dblclick', (e) => {
-        e.preventDefault();
-        setViewingMode('map', activeCursorCoords, 9);
-      });
-
       updateGlobeDisplay();
     }
 
@@ -430,11 +501,11 @@
       myLeafletMap.addLayer(leafletMarkersGroup);
 
       myLeafletMap.on('zoomend', () => {
-        if (currentMode === 'map' && myLeafletMap.getZoom() <= 4 && !isZoomSwitching) {
-          isZoomSwitching = true;
+        if (currentMode === 'map' && myLeafletMap.getZoom() <= 4 && !isTransitioningMode) {
+          isTransitioningMode = true;
           const center = myLeafletMap.getCenter();
           setViewingMode('globe', { lat: center.lat, lng: center.lng, altitude: 2.1 });
-          setTimeout(() => { isZoomSwitching = false; }, 800);
+          setTimeout(() => { isTransitioningMode = false; }, 1000);
         }
       });
 
@@ -471,9 +542,9 @@
       const btnRotate = document.getElementById('btn-toggle-rotate');
 
       if (mode === 'map') {
-        let lat = targetCoords ? targetCoords.lat : activeCursorCoords.lat;
-        let lng = targetCoords ? normalizeLongitude(targetCoords.lng) : activeCursorCoords.lng;
-        let zoom = targetZoom || 10;
+        let lat = targetCoords ? targetCoords.lat : (activeCursorCoords ? activeCursorCoords.lat : 27.2579);
+        let lng = targetCoords ? normalizeLongitude(targetCoords.lng) : (activeCursorCoords ? activeCursorCoords.lng : 33.8116);
+        let zoom = targetZoom || 9;
 
         globeView.classList.replace('opacity-100', 'opacity-0');
         globeView.classList.replace('pointer-events-auto', 'pointer-events-none');
@@ -524,20 +595,45 @@
       updateSpotToggleButton();
     }
 
+    function triggerManualMapSwitch() {
+      const target = getExactGlobeCenterCoords();
+      setViewingMode('map', target, 9);
+    }
+
     function selectSpot(spot) {
       currentSelectedSpot = spot;
       const card = document.getElementById('destination-card');
       const img = document.getElementById('card-img');
-      const badge = document.getElementById('card-badge');
+      const tagsContainer = document.getElementById('card-photo-tags');
       const title = document.getElementById('card-title');
       const location = document.getElementById('card-location');
       const desc = document.getElementById('card-description');
       const link = document.getElementById('card-link');
 
-      const cat = CATEGORIES[spot.category] || { label: 'Étape', color: '#06b6d4', icon: 'fa-map-pin' };
       img.src = spot.image;
-      badge.style.backgroundColor = cat.color;
-      badge.innerHTML = `<i class="fa-solid ${cat.icon} mr-1"></i> ${cat.label}`;
+      tagsContainer.innerHTML = '';
+
+      let spotCategories = [];
+      if (spot.counts) {
+        Object.keys(spot.counts).forEach(k => {
+          if (CATEGORIES[k]) spotCategories.push(k);
+        });
+      }
+      if (spotCategories.length === 0 && spot.category) {
+        spotCategories.push(spot.category);
+      }
+
+      // Affichage des cartouches d'étiquettes dans l'espace situé sous l'image
+      spotCategories.forEach(catKey => {
+        const cat = CATEGORIES[catKey];
+        if (!cat) return;
+        const tag = document.createElement('div');
+        tag.className = 'px-2.5 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider shadow flex items-center gap-1.5 border border-white/20';
+        tag.style.backgroundColor = cat.color;
+        tag.innerHTML = `<i class="fa-solid ${cat.icon}"></i><span>${cat.label}</span>`;
+        tagsContainer.appendChild(tag);
+      });
+
       title.innerText = spot.name;
       location.querySelector('span').innerText = `${spot.country} · ${spot.lat.toFixed(4)}°N, ${spot.lng.toFixed(4)}°E`;
       desc.innerText = spot.description;
@@ -563,9 +659,10 @@
         if (currentSelectedSpot) {
           setViewingMode('map', { lat: currentSelectedSpot.lat, lng: currentSelectedSpot.lng }, 13);
         } else {
-          setViewingMode('map');
+          triggerManualMapSwitch();
         }
       } else {
+        closeSpotCard();
         setViewingMode('globe', { lat: 27.2579, lng: 33.8116, altitude: 2.1 });
       }
     }
@@ -579,7 +676,7 @@
         btnLabel.innerText = "Explorer en 2D";
       } else {
         btnIcon.className = "fa-solid fa-globe text-cyan-400 text-[10px]";
-        btnLabel.innerText = "Observer en 3D (Globe)";
+        btnLabel.innerText = "Observer en 3D (Retour globe)";
       }
     }
 
@@ -607,32 +704,39 @@
       if (!myGlobe) return;
       
       const spots = getFilteredSpots();
+      const pov = myGlobe.pointOfView();
       const clusterMap = new Map();
       const finalElements = [];
 
-      spots.forEach(spot => {
-        const key = `${Math.round(spot.lat * 20)}_${Math.round(spot.lng * 20)}`;
-        if (!clusterMap.has(key)) {
-          clusterMap.set(key, []);
-        }
-        clusterMap.get(key).push(spot);
-      });
+      const shouldCluster = pov && pov.altitude > 0.35;
 
-      clusterMap.forEach((group) => {
-        if (group.length > 1) {
-          let avgLat = group.reduce((sum, s) => sum + s.lat, 0) / group.length;
-          let avgLng = group.reduce((sum, s) => sum + s.lng, 0) / group.length;
-          finalElements.push({
-            isCluster: true,
-            lat: avgLat,
-            lng: avgLng,
-            count: group.length,
-            spots: group
-          });
-        } else {
-          finalElements.push(group[0]);
-        }
-      });
+      if (shouldCluster) {
+        spots.forEach(spot => {
+          const key = `${Math.round(spot.lat * 1.5)},${Math.round(spot.lng * 1.5)}`;
+          if (!clusterMap.has(key)) {
+            clusterMap.set(key, []);
+          }
+          clusterMap.get(key).push(spot);
+        });
+
+        clusterMap.forEach((group) => {
+          if (group.length > 1) {
+            let avgLat = group.reduce((sum, s) => sum + s.lat, 0) / group.length;
+            let avgLng = group.reduce((sum, s) => sum + s.lng, 0) / group.length;
+            finalElements.push({
+              isCluster: true,
+              lat: avgLat,
+              lng: avgLng,
+              count: group.length,
+              spots: group
+            });
+          } else {
+            finalElements.push(group[0]);
+          }
+        });
+      } else {
+        spots.forEach(s => finalElements.push(s));
+      }
 
       myGlobe.htmlElementsData(finalElements);
       updateStats();
@@ -652,16 +756,16 @@
           lastSection = cat.section;
           if (container.children.length > 0) {
             const sep = document.createElement('div');
-            sep.className = 'w-full h-[1px] bg-slate-700/60 my-2';
+            sep.className = 'w-full h-[1px] bg-slate-700/80 my-2.5';
             container.appendChild(sep);
           }
           const sectionHeader = document.createElement('div');
-          sectionHeader.className = 'pb-1 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5';
+          sectionHeader.className = 'pb-1 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 px-2 py-1 rounded';
           if (lastSection === 'culture') {
-            sectionHeader.className += ' text-amber-500';
+            sectionHeader.className += ' text-amber-500 bg-amber-950/50 border border-amber-600/30';
             sectionHeader.innerHTML = '<i class="fa-solid fa-landmark"></i> Culture & Patrimoine';
           } else {
-            sectionHeader.className += ' text-cyan-400';
+            sectionHeader.className += ' text-cyan-400 bg-cyan-950/50 border border-cyan-600/30';
             sectionHeader.innerHTML = '<i class="fa-solid fa-water"></i> Nature & Eau';
           }
           container.appendChild(sectionHeader);
@@ -716,9 +820,19 @@
           lastSection = cat.section;
           if (narrowContainer.children.length > 0) {
             const sep = document.createElement('div');
-            sep.className = 'w-8 h-[1px] bg-slate-700/60 my-1.5';
+            sep.className = 'w-10 h-[1px] bg-cyan-500/30 my-2';
             narrowContainer.appendChild(sep);
           }
+          const miniHeader = document.createElement('div');
+          miniHeader.className = 'w-full text-center py-1 text-[9px] font-bold rounded';
+          if (lastSection === 'culture') {
+            miniHeader.className += ' text-amber-400 bg-amber-950/60 border border-amber-600/30';
+            miniHeader.innerHTML = '<i class="fa-solid fa-landmark"></i>';
+          } else {
+            miniHeader.className += ' text-cyan-400 bg-cyan-950/60 border border-cyan-600/30';
+            miniHeader.innerHTML = '<i class="fa-solid fa-water"></i>';
+          }
+          narrowContainer.appendChild(miniHeader);
         }
 
         let count = 0;
@@ -750,7 +864,8 @@
         const pov = myGlobe.pointOfView();
         const nextAlt = pov.altitude - 0.35;
         if (nextAlt <= 0.28) {
-          setViewingMode('map', activeCursorCoords, 9);
+          const target = activeCursorCoords || getExactGlobeCenterCoords();
+          setViewingMode('map', target, 9);
         } else {
           myGlobe.pointOfView({ altitude: nextAlt }, 350);
         }
