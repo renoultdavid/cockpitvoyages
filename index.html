@@ -53,31 +53,7 @@
       justify-content: center;
     }
 
-    @keyframes radar-pulse-dynamic {
-      0% { transform: scale(0.6); opacity: 0.9; }
-      100% { transform: scale(var(--pulse-scale, 2.8)); opacity: 0; }
-    }
-
-    .marker-radar-dynamic {
-      animation: radar-pulse-dynamic var(--pulse-speed, 2s) cubic-bezier(0, 0, 0.2, 1) infinite;
-    }
-
-    @keyframes counter-pulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(34, 211, 238, 0); }
-      50% { transform: scale(1.03); box-shadow: 0 0 12px rgba(34, 211, 238, 0.4); }
-    }
-    .counter-pulse-anim {
-      animation: counter-pulse 2.8s ease-in-out infinite;
-    }
-
-    @keyframes counter-pulse-amber {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
-      50% { transform: scale(1.03); box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
-    }
-    .counter-pulse-amber-anim {
-      animation: counter-pulse-amber 3.2s ease-in-out infinite;
-    }
-
+    /* Style statique épuré pour les clusters sans aucune pulsation énergivore */
     .custom-cluster-icon {
       background: rgba(14, 116, 144, 0.95);
       border: 2px solid #22d3ee;
@@ -88,7 +64,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 16px rgba(34, 211, 238, 0.6);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     }
 
     /* Ascenseur discret et élégant pour le volet d'information */
@@ -512,6 +488,7 @@
     let isTransitioningMode = false;
     let activeCursorCoords = { lat: 27.2579, lng: 33.8116 };
     let isFiltersPanelOpen = true;
+    let clusterDebounceTimeout = null;
 
     function toggleFiltersPanel() {
       isFiltersPanelOpen = !isFiltersPanelOpen;
@@ -606,26 +583,21 @@
 
           if (d.isCluster) {
             const count = d.count;
-            const pulseScale = count > 1 ? Math.min(4.5, 1.3 + (count * 0.4)) : 1;
-            const pulseSpeed = Math.max(0.3, 1.8 - (count * 0.2));
-            const radarClass = count > 1 ? 'marker-radar-dynamic' : '';
-
             anchor.innerHTML = `
               <div class="relative flex items-center justify-center pointer-events-auto">
-                <span class="absolute w-12 h-12 rounded-full ${radarClass} pointer-events-none" style="background-color: #22d3ee; --pulse-scale: ${pulseScale}; --pulse-speed: ${pulseSpeed}s;"></span>
-                <div class="relative px-3 py-1 rounded-full flex items-center gap-1 text-white font-black text-xs bg-gradient-to-r from-cyan-600 to-blue-600 border-2 border-white shadow-xl cursor-pointer transform hover:scale-125 transition">
-                  <span>📍</span>
-                  <span class="font-mono text-xs">${count}</span>
+                <div class="px-3 py-1 rounded-full flex items-center gap-1.5 text-white font-bold text-xs bg-slate-900/95 border-2 border-cyan-400 shadow-xl cursor-pointer hover:scale-115 hover:border-cyan-300 transition-transform duration-150">
+                  <span class="text-cyan-400 text-[10px]">📍</span>
+                  <span class="font-mono text-xs font-black tracking-tight text-white">${count}</span>
                 </div>
                 <!-- Étiquette flottante cluster -->
-                <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none whitespace-nowrap px-2 py-0.5 rounded-lg bg-slate-950/95 border border-cyan-400/50 text-[10px] font-bold text-cyan-300 shadow-xl z-50">
+                <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none whitespace-nowrap px-2 py-0.5 rounded-lg bg-slate-950/95 border border-cyan-400/50 text-[10px] font-bold text-cyan-300 shadow-xl z-50">
                   ${count} sites regroupés
                 </div>
               </div>
             `;
             anchor.onclick = (e) => {
               e.stopPropagation();
-              myGlobe.pointOfView({ lat: d.lat, lng: d.lng, altitude: 0.35 }, 1000);
+              myGlobe.pointOfView({ lat: d.lat, lng: d.lng, altitude: 0.35 }, 900);
             };
             return anchor;
           }
@@ -636,11 +608,11 @@
 
           anchor.innerHTML = `
             <div class="relative flex items-center justify-center pointer-events-auto">
-              <div class="relative w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] border-2 border-white/90 shadow-lg cursor-pointer transition hover:scale-125" style="background-color: ${cat.color}; box-shadow: 0 0 10px ${cat.color};">
+              <div class="relative w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] border-2 border-white/90 shadow-lg cursor-pointer hover:scale-120 transition-transform duration-150" style="background-color: ${cat.color};">
                 <i class="fa-solid ${cat.icon}"></i>
               </div>
               <!-- Étiquette flottante au survol d'un point 3D -->
-              <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none whitespace-nowrap px-2 py-1 rounded-lg bg-slate-950/95 border border-cyan-400/60 text-[10px] font-bold text-white shadow-2xl flex items-center gap-1.5 z-50">
+              <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none whitespace-nowrap px-2 py-1 rounded-lg bg-slate-950/95 border border-cyan-400/60 text-[10px] font-bold text-white shadow-2xl flex items-center gap-1.5 z-50">
                 <span>${spot.flag || '📍'}</span>
                 <span>${spot.name}</span>
               </div>
@@ -656,12 +628,13 @@
       myGlobe.pointOfView({ lat: 27.2579, lng: 33.8116, altitude: 2.1 }, 0);
 
       const controls = myGlobe.controls();
-      controls.autoRotate = true;
+      controls.autoRotate = false;
       controls.autoRotateSpeed = 0.5;
       controls.enableDamping = true;
       controls.dampingFactor = 0.08;
-      controls.minDistance = 105;
-      controls.maxDistance = 550;
+      controls.minDistance = 101;
+      controls.maxDistance = 1200;
+      controls.enabled = true;
 
       controls.addEventListener('start', () => {
         if (isAutoRotating) {
@@ -681,8 +654,11 @@
         }
       });
 
-      controls.addEventListener('change', checkContinuousGlobeZoom);
-      container.addEventListener('wheel', () => setTimeout(checkContinuousGlobeZoom, 50), { passive: true });
+      controls.addEventListener('change', () => {
+        checkContinuousGlobeZoom();
+        if (clusterDebounceTimeout) clearTimeout(clusterDebounceTimeout);
+        clusterDebounceTimeout = setTimeout(updateGlobeDisplay, 90);
+      });
 
       updateGlobeDisplay();
     }
@@ -780,10 +756,11 @@
         let lng = targetCoords ? normalizeLongitude(targetCoords.lng) : (activeCursorCoords ? activeCursorCoords.lng : 33.8116);
         let zoom = targetZoom || 9;
 
-        globeView.classList.replace('opacity-100', 'opacity-0');
-        globeView.classList.replace('pointer-events-auto', 'pointer-events-none');
-        mapView.classList.replace('opacity-0', 'opacity-100');
-        mapView.classList.replace('pointer-events-none', 'pointer-events-auto');
+        // Désactivation totale des interactions du Globe au profit de Leaflet
+        globeView.style.opacity = '0';
+        globeView.style.pointerEvents = 'none';
+        mapView.style.opacity = '1';
+        mapView.style.pointerEvents = 'auto';
 
         btnMap.classList.add('bg-cyan-500', 'text-white', 'shadow');
         btnMap.classList.remove('text-slate-300');
@@ -806,10 +783,11 @@
         let lng = targetCoords ? normalizeLongitude(targetCoords.lng) : 33.8116;
         let altitude = targetCoords && targetCoords.altitude ? targetCoords.altitude : 2.1;
 
-        mapView.classList.replace('opacity-100', 'opacity-0');
-        mapView.classList.replace('pointer-events-none', 'pointer-events-auto');
-        globeView.classList.replace('opacity-0', 'opacity-100');
-        globeView.classList.replace('pointer-events-none', 'pointer-events-auto');
+        // Neutralisation complète de Leaflet pour ne jamais bloquer le Globe en vue dézoomée
+        mapView.style.opacity = '0';
+        mapView.style.pointerEvents = 'none';
+        globeView.style.opacity = '1';
+        globeView.style.pointerEvents = 'auto';
 
         btnGlobe.classList.add('bg-cyan-500', 'text-white', 'shadow');
         btnGlobe.classList.remove('text-slate-300');
@@ -822,8 +800,12 @@
         btnRotate.classList.remove('hidden');
 
         if (myGlobe) {
+          const controls = myGlobe.controls();
+          if (controls) {
+            controls.enabled = true;
+          }
           setTimeout(onWindowResize, 100);
-          myGlobe.pointOfView({ lat: lat, lng: lng, altitude: altitude }, 1000);
+          myGlobe.pointOfView({ lat: lat, lng: lng, altitude: altitude }, 800);
         }
       }
       updateSpotToggleButton();
@@ -970,38 +952,62 @@
       
       const filteredSpots = getFilteredSpots();
       const pov = myGlobe.pointOfView();
-      const clusterMap = new Map();
-      const finalElements = [];
+      const altitude = (pov && typeof pov.altitude === 'number' && !isNaN(pov.altitude)) ? pov.altitude : 2.0;
 
-      const shouldCluster = pov && pov.altitude > 0.35;
-
-      if (shouldCluster) {
-        filteredSpots.forEach(spot => {
-          const key = `${Math.round(spot.lat * 1.5)},${Math.round(spot.lng * 1.5)}`;
-          if (!clusterMap.has(key)) {
-            clusterMap.set(key, []);
-          }
-          clusterMap.get(key).push(spot);
-        });
-
-        clusterMap.forEach((group) => {
-          if (group.length > 1) {
-            let avgLat = group.reduce((sum, s) => sum + s.lat, 0) / group.length;
-            let avgLng = group.reduce((sum, s) => sum + s.lng, 0) / group.length;
-            finalElements.push({
-              isCluster: true,
-              lat: avgLat,
-              lng: avgLng,
-              count: group.length,
-              spots: group
-            });
-          } else {
-            finalElements.push({ spot: group[0], lat: group[0].lat, lng: group[0].lng });
-          }
-        });
-      } else {
-        filteredSpots.forEach(spot => finalElements.push({ spot: spot, lat: spot.lat, lng: spot.lng }));
+      // En vue rapprochée (< 0.45 d'altitude), aucun regroupement : affichage unitaire immédiat
+      if (altitude <= 0.45) {
+        myGlobe.htmlElementsData(filteredSpots.map(spot => ({ spot, lat: spot.lat, lng: spot.lng })));
+        updateStats();
+        return;
       }
+
+      // En vue éloignée : le rayon angulaire s'élargit progressivement.
+      // À altitude globale (>= 1.6), le seuil de 25° regroupe immédiatement tous les sites en 1 cluster unique
+      const clusterThresholdDeg = altitude >= 1.6 ? 26 : Math.max(1.8, (altitude - 0.3) * 11);
+      const clusters = [];
+
+      filteredSpots.forEach(spot => {
+        let placedInCluster = false;
+        for (let cluster of clusters) {
+          const dLat = Math.abs(cluster.centerLat - spot.lat);
+          const dLng = Math.abs(normalizeLongitude(cluster.centerLng - spot.lng));
+          const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+
+          if (dist <= clusterThresholdDeg) {
+            cluster.spots.push(spot);
+            cluster.centerLat = cluster.spots.reduce((acc, s) => acc + s.lat, 0) / cluster.spots.length;
+            cluster.centerLng = cluster.spots.reduce((acc, s) => acc + s.lng, 0) / cluster.spots.length;
+            placedInCluster = true;
+            break;
+          }
+        }
+
+        if (!placedInCluster) {
+          clusters.push({
+            centerLat: spot.lat,
+            centerLng: spot.lng,
+            spots: [spot]
+          });
+        }
+      });
+
+      const finalElements = clusters.map(c => {
+        if (c.spots.length > 1) {
+          return {
+            isCluster: true,
+            lat: c.centerLat,
+            lng: c.centerLng,
+            count: c.spots.length,
+            spots: c.spots
+          };
+        } else {
+          return {
+            spot: c.spots[0],
+            lat: c.spots[0].lat,
+            lng: c.spots[0].lng
+          };
+        }
+      });
 
       myGlobe.htmlElementsData(finalElements);
       updateStats();
