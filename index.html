@@ -3276,8 +3276,11 @@ function spotMatchesFilter(spot) {
         leafletMarkersGroup = L.markerClusterGroup({
           spiderfyOnMaxZoom: true,
           showCoverageOnHover: false,
-          zoomToBoundsOnClick: false, // Désactivé pour empêcher le dézoom global
-          maxClusterRadius: 40,
+          zoomToBoundsOnClick: true,
+          maxClusterRadius: 50,
+          disableClusteringAtZoom: 16,
+          animate: true,
+          animateAddingMarkers: true,
           iconCreateFunction: function(cluster) {
             return L.divIcon({
               html: `<span>${cluster.getChildCount()}</span>`,
@@ -3609,13 +3612,14 @@ function spotMatchesFilter(spot) {
         return c < (Math.PI / 2 + 0.1);
       });
 
-      if (altitude <= 0.45) {
+      if (altitude <= 0.18) {
         myGlobe.htmlElementsData(visibleSpots.map(spot => ({ spot, lat: spot.lat, lng: spot.lng })));
         updateStats();
         return;
       }
 
-      const clusterThresholdDeg = altitude >= 1.6 ? 26 : Math.max(1.8, (altitude - 0.3) * 11);
+      // Éclatement progressif proportionnel à l'altitude sans rupture brutale
+      const clusterThresholdDeg = altitude >= 1.6 ? 26 : Math.max(0.6, (altitude - 0.15) * 8.5);
       const clusters = [];
 
       visibleSpots.forEach(spot => {
