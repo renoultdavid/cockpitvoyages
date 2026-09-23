@@ -3126,7 +3126,7 @@
         leafletMarkersGroup = L.markerClusterGroup({
           spiderfyOnMaxZoom: true,
           showCoverageOnHover: false,
-          zoomToBoundsOnClick: true,
+          zoomToBoundsOnClick: false, // Désactivé pour empêcher le dézoom global
           maxClusterRadius: 40,
           iconCreateFunction: function(cluster) {
             return L.divIcon({
@@ -3135,6 +3135,13 @@
               iconSize: L.point(32, 32)
             });
           }
+        });
+
+        // Gestion propre du clic sur cluster : zoome localement sans brusquerie
+        leafletMarkersGroup.on('clusterclick', function (a) {
+          const currentZoom = myLeafletMap.getZoom();
+          const targetZoom = Math.min(myLeafletMap.getMaxZoom(), currentZoom + 2);
+          myLeafletMap.setView(a.latlng, targetZoom, { animate: true });
         });
       } else {
         leafletMarkersGroup = L.featureGroup();
@@ -3346,7 +3353,9 @@
       if (currentMode === 'globe' && myGlobe) {
         myGlobe.pointOfView({ lat: spot.lat, lng: spot.lng, altitude: 0.35 }, 1000);
       } else if (currentMode === 'map' && myLeafletMap) {
-        myLeafletMap.flyTo([spot.lat, spot.lng], 13, { duration: 1.0 });
+        const currentZoom = myLeafletMap.getZoom();
+        const targetZoom = Math.max(currentZoom, 13);
+        myLeafletMap.setView([spot.lat, spot.lng], targetZoom, { animate: true });
       }
     }
 
