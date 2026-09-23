@@ -42,6 +42,15 @@
       box-shadow: 0 12px 35px -5px rgba(0, 0, 0, 0.7);
     }
 
+    /* Thème Bleu Nuit / Saphir pour les Pays Visités & Stats */
+    .glass-panel-indigo {
+      background: rgba(10, 16, 38, 0.96);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(99, 102, 241, 0.45);
+      box-shadow: 0 16px 45px -5px rgba(0, 0, 0, 0.9);
+    }
+
     .globe-marker-anchor {
       position: absolute;
       pointer-events: auto;
@@ -53,7 +62,6 @@
       justify-content: center;
     }
 
-    /* Style statique épuré pour les clusters sans aucune pulsation énergivore */
     .custom-cluster-icon {
       background: rgba(14, 116, 144, 0.95);
       border: 2px solid #22d3ee;
@@ -67,23 +75,16 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     }
 
-    /* Ascenseur discret et élégant pour le volet d'information */
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.5);
-      border-radius: 9999px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(34, 211, 238, 0.35);
-      border-radius: 9999px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(34, 211, 238, 0.65);
-    }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.35); border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(34, 211, 238, 0.65); }
 
-    /* Style du tooltip flottant Leaflet */
+    .custom-scrollbar-indigo::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar-indigo::-webkit-scrollbar-track { background: rgba(10, 16, 38, 0.5); border-radius: 9999px; }
+    .custom-scrollbar-indigo::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.45); border-radius: 9999px; }
+    .custom-scrollbar-indigo::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.75); }
+
     .leaflet-tooltip.custom-leaflet-tooltip {
       background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(8px);
@@ -99,9 +100,6 @@
     .leaflet-tooltip.custom-leaflet-tooltip::before {
       border-top-color: rgba(34, 211, 238, 0.5);
     }
-
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
     .panel-transition {
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, width 0.3s ease;
@@ -125,8 +123,10 @@
     <div id="leaflet-container" class="w-full h-full"></div>
   </div>
 
-  <header class="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
-    <div class="flex items-center gap-2 pointer-events-auto">
+  <!-- Barre supérieure du cockpit -->
+  <header class="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none gap-2">
+    <!-- Côté gauche : Marque & Bascule 3D/2D -->
+    <div class="flex items-center gap-2 pointer-events-auto shrink-0">
       <div class="glass-panel px-3 py-2 rounded-2xl flex items-center gap-2.5">
         <div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25 text-white">
           <i id="header-mode-icon" class="fa-solid fa-earth-africa text-xs"></i>
@@ -150,9 +150,10 @@
       </div>
     </div>
 
-    <!-- Compteurs hauts (Sites & Pays visités) -->
-    <div class="flex items-center gap-2 pointer-events-auto">
-      <div class="glass-panel px-3 py-1.5 rounded-2xl flex items-center gap-2 counter-pulse-anim border border-cyan-500/40">
+    <!-- Centre : Compteurs hauts (Sites & Menu Pays visités en Bleu Saphir / Indigo) -->
+    <div class="relative flex items-center gap-2 pointer-events-auto">
+      <!-- Sites visités -->
+      <div class="glass-panel px-3 py-1.5 rounded-2xl flex items-center gap-2 border border-cyan-500/30">
         <div class="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs">
           <i class="fa-solid fa-map-pin"></i>
         </div>
@@ -161,38 +162,368 @@
           <div id="header-stat-sites" class="text-xs font-black text-cyan-300 font-mono">0</div>
         </div>
       </div>
-      <div class="glass-panel px-3 py-1.5 rounded-2xl flex items-center gap-2 counter-pulse-amber-anim border border-amber-500/40">
-        <div class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs">
-          <i class="fa-solid fa-globe"></i>
+
+      <!-- Pays visités (Bleu nuit / Indigo saphir profond) -->
+      <button id="btn-dropdown-countries" onclick="toggleCountriesMenu(event)" class="glass-panel px-3 py-1.5 rounded-2xl flex items-center gap-2 border border-indigo-500/50 hover:border-indigo-400 hover:bg-slate-900/90 transition shadow-lg group cursor-pointer" title="Afficher la liste des pays visités">
+        <div class="w-6 h-6 rounded-lg bg-indigo-500/25 text-indigo-300 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+          <i class="fa-solid fa-earth-americas"></i>
         </div>
-        <div>
-          <div class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Pays visités</div>
-          <div id="header-stat-countries" class="text-xs font-black text-amber-300 font-mono">0</div>
+        <div class="text-left">
+          <div class="text-[9px] uppercase tracking-wider text-indigo-300/90 font-bold flex items-center gap-1">
+            Pays visités <i id="icon-countries-chevron" class="fa-solid fa-chevron-down text-[8px] transition-transform duration-200"></i>
+          </div>
+          <div id="header-stat-countries" class="text-xs font-black text-indigo-200 font-mono">0</div>
         </div>
+      </button>
+
+      <!-- Menu déroulant des pays -->
+      <div id="countries-dropdown" class="glass-panel-indigo absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-2xl p-2.5 shadow-2xl hidden z-50 transition-all duration-200 border border-indigo-500/40">
+        <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-indigo-500/30 px-1">
+          <div class="flex items-center gap-1.5 text-indigo-200 text-[11px] font-bold uppercase tracking-wider">
+            <i class="fa-solid fa-flag text-xs text-indigo-400"></i>
+            <span>Pays explorés</span>
+          </div>
+          <span id="dropdown-country-badge" class="font-mono text-[10px] text-indigo-300 font-bold px-1.5 py-0.5 rounded bg-indigo-950/80 border border-indigo-500/40"></span>
+        </div>
+        <div id="countries-list-container" class="space-y-1 max-h-56 overflow-y-auto custom-scrollbar-indigo pr-1"></div>
       </div>
     </div>
 
-    <!-- Saut Rapide -->
-    <div class="hidden lg:flex items-center gap-1.5 pointer-events-auto glass-panel px-2.5 py-1.5 rounded-2xl">
-      <button onclick="flyToSpotCoordinates(27.2579, 33.8116, 12)" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-cyan-500/25 hover:bg-cyan-500/35 text-cyan-300 border border-cyan-500/40 transition flex items-center gap-1">
-        <span>🐠</span> Hurghada
+    <!-- Côté droit : Recherche instantanée, 5 Mini-popups thématiques, Surprise & Plein Écran -->
+    <div class="flex items-center gap-1.5 pointer-events-auto">
+      <!-- Recherche rapide avec autocomplétion -->
+      <div class="relative">
+        <div class="glass-panel flex items-center rounded-2xl px-2.5 py-1.5 focus-within:border-cyan-400/70 transition w-32 sm:w-40 lg:w-44">
+          <i class="fa-solid fa-magnifying-glass text-cyan-400 text-xs mr-2 shrink-0"></i>
+          <input id="quick-search-input" type="text" placeholder="Chercher..." oninput="handleQuickSearch(this.value)" onfocus="handleQuickSearch(this.value)" class="bg-transparent text-xs text-slate-100 placeholder-slate-400 focus:outline-none w-full">
+          <button id="quick-search-clear" onclick="clearQuickSearch()" class="hidden text-slate-400 hover:text-white text-xs ml-1">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="quick-search-results" class="glass-panel absolute top-full right-0 mt-2 w-64 sm:w-72 rounded-2xl p-1.5 shadow-2xl hidden z-50 max-h-64 overflow-y-auto custom-scrollbar border border-cyan-500/40"></div>
+      </div>
+
+      <!-- Mini-icône 1 : Base Casinca & Caps Cardinaux (Trophée) -->
+      <div class="relative">
+        <button id="btn-popup-home" onclick="togglePopup('modal-home', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-amber-400 hover:text-white hover:border-amber-400/70 transition shadow" title="Base Castellare & Boussole des Extrêmes">
+          <i class="fa-solid fa-award text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Mini-icône 2 : Baromètre Mondial ONU & Subdivisions (Globe Territoires) -->
+      <div class="relative">
+        <button id="btn-popup-territories" onclick="togglePopup('modal-territories', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-blue-400 hover:text-white hover:border-blue-400/70 transition shadow" title="Baromètre Mondial ONU & Subdivisions Territoriales">
+          <i class="fa-solid fa-earth-americas text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Mini-icône 3 : Kilométrage Différencié Avion / Route / Mer (Compas) -->
+      <div class="relative">
+        <button id="btn-popup-odyssey" onclick="togglePopup('modal-odyssey', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-400/70 transition shadow" title="Kilométrage Avion, Route & Mer">
+          <i class="fa-solid fa-route text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Mini-icône 4 : Altimètre des Extrêmes & Baromètre Îles (Montagne) -->
+      <div class="relative">
+        <button id="btn-popup-altitude" onclick="togglePopup('modal-altitude', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-emerald-400 hover:text-white hover:border-emerald-400/70 transition shadow" title="Altimètre des Extrêmes & Terre Insulaire vs Continent">
+          <i class="fa-solid fa-mountain-sun text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Mini-icône 5 : Chrono-Scope des Civilisations & UNESCO (Sablier) -->
+      <div class="relative">
+        <button id="btn-popup-chrono" onclick="togglePopup('modal-chrono', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-indigo-300 hover:text-white hover:border-indigo-400/70 transition shadow" title="Chrono-Scope des Civilisations & UNESCO">
+          <i class="fa-solid fa-landmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Bouton Destination Surprise -->
+      <button onclick="pickRandomDestination()" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-400/60 transition shadow" title="Destination au hasard (Surprise !)">
+        <span class="text-xs sm:text-sm">🎲</span>
       </button>
-      <button onclick="flyToSpotCoordinates(22.3372, 31.6258, 11)" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-500/25 hover:bg-amber-500/35 text-amber-300 border border-amber-500/40 transition flex items-center gap-1">
-        <span>🏛️</span> Abou Simbel
-      </button>
-      <button onclick="flyToSpotCoordinates(24.0255, 32.8842, 12)" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-600/25 hover:bg-amber-600/35 text-amber-200 border border-amber-500/40 transition flex items-center gap-1">
-        <span>⛩️</span> Philae
-      </button>
-      <button onclick="resetGlobalView()" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1" title="Vue globale planète 3D">
-        <i class="fa-solid fa-globe"></i> Globe
+
+      <!-- Bouton Plein Écran -->
+      <button onclick="toggleFullScreen()" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-slate-300 hover:text-cyan-300 transition shadow" title="Mode plein écran">
+        <i id="fullscreen-icon" class="fa-solid fa-expand text-xs"></i>
       </button>
     </div>
   </header>
 
+  <!-- POPUP 1 : BASE CASTELLARE-DI-CASINCA & LES 4 CAPS CARDINAUX -->
+  <div id="modal-home" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-72 sm:w-80 rounded-2xl p-3.5 shadow-2xl hidden border border-amber-500/50">
+    <div class="flex items-center justify-between pb-2 mb-2 border-b border-amber-500/30">
+      <div class="flex items-center gap-1.5 text-amber-200 text-xs font-bold uppercase tracking-wider">
+        <i class="fa-solid fa-house-chimney text-amber-400"></i>
+        <span>Base : Castellare-di-Casinca</span>
+      </div>
+      <button onclick="closeAllPopups()" class="text-slate-400 hover:text-white text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="space-y-2 text-xs">
+      <!-- Le Bout du Monde depuis Castellare -->
+      <div class="bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/30">
+        <div class="text-[9px] uppercase font-bold text-amber-300 flex items-center justify-between">
+          <span><i class="fa-solid fa-paper-plane mr-1"></i> Plus lointain de Castellare</span>
+          <span id="stat-home-farthest-dist" class="font-mono text-amber-200 font-black text-xs">0 km</span>
+        </div>
+        <div id="stat-home-farthest-name" class="text-xs font-bold text-white mt-1 leading-snug"></div>
+      </div>
+
+      <!-- Les 4 Caps Cardinaux Extrêmes de vos voyages -->
+      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 space-y-1.5">
+        <div class="text-[9px] uppercase font-bold text-indigo-300 tracking-wider">Boussole des Extrêmes</div>
+        
+        <div class="grid grid-cols-2 gap-1.5">
+          <div class="bg-slate-950/70 p-1.5 rounded-lg border border-slate-800/80">
+            <div class="text-[8px] uppercase font-bold text-cyan-400 flex items-center gap-1">
+              <i class="fa-solid fa-arrow-up"></i> Cap Nord
+            </div>
+            <div id="stat-cardinal-north" class="text-[10px] font-semibold text-white mt-0.5 truncate"></div>
+          </div>
+          <div class="bg-slate-950/70 p-1.5 rounded-lg border border-slate-800/80">
+            <div class="text-[8px] uppercase font-bold text-rose-400 flex items-center gap-1">
+              <i class="fa-solid fa-arrow-down"></i> Cap Sud
+            </div>
+            <div id="stat-cardinal-south" class="text-[10px] font-semibold text-white mt-0.5 truncate"></div>
+          </div>
+          <div class="bg-slate-950/70 p-1.5 rounded-lg border border-slate-800/80">
+            <div class="text-[8px] uppercase font-bold text-emerald-400 flex items-center gap-1">
+              <i class="fa-solid fa-arrow-left"></i> Cap Ouest
+            </div>
+            <div id="stat-cardinal-west" class="text-[10px] font-semibold text-white mt-0.5 truncate"></div>
+          </div>
+          <div class="bg-slate-950/70 p-1.5 rounded-lg border border-slate-800/80">
+            <div class="text-[8px] uppercase font-bold text-amber-400 flex items-center gap-1">
+              <i class="fa-solid fa-arrow-right"></i> Cap Est
+            </div>
+            <div id="stat-cardinal-east" class="text-[10px] font-semibold text-white mt-0.5 truncate"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Envergure Maximale entre deux points de vos voyages -->
+      <div class="bg-indigo-950/40 p-2 rounded-xl border border-indigo-500/30">
+        <div class="text-[9px] uppercase font-bold text-indigo-300 flex items-center justify-between">
+          <span><i class="fa-solid fa-arrows-left-right mr-1"></i> Envergure maximale</span>
+          <span id="stat-max-dist" class="font-mono text-cyan-300 font-extrabold text-[11px]">0 km</span>
+        </div>
+        <p id="stat-max-pair" class="text-[10px] text-slate-300 mt-0.5 leading-tight"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP 2 : BAROMÈTRE MONDIAL ONU & SUBDIVISIONS TERRITORIALES -->
+  <div id="modal-territories" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-80 sm:w-96 rounded-2xl p-3.5 shadow-2xl hidden border border-blue-500/50">
+    <div class="flex items-center justify-between pb-2 mb-2 border-b border-blue-500/30">
+      <div class="flex items-center gap-1.5 text-blue-200 text-xs font-bold uppercase tracking-wider">
+        <i class="fa-solid fa-earth-americas text-blue-400"></i>
+        <span>Monde & Subdivisions</span>
+      </div>
+      <button onclick="closeAllPopups()" class="text-slate-400 hover:text-white text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Sélecteur d'onglets internes -->
+    <div class="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl mb-2.5 border border-slate-800">
+      <button id="tab-btn-world" onclick="switchTerritoryTab('world')" class="flex-1 py-1 rounded-lg text-[10px] font-bold transition bg-blue-600 text-white shadow">
+        🌍 Monde ONU & Continents
+      </button>
+      <button id="tab-btn-subdiv" onclick="switchTerritoryTab('subdiv')" class="flex-1 py-1 rounded-lg text-[10px] font-bold transition text-slate-400 hover:text-white">
+        🏛️ Subdivisions & Régions
+      </button>
+    </div>
+
+    <!-- Onglet 1 : Monde ONU & Continents -->
+    <div id="tab-content-world" class="space-y-2 text-xs">
+      <!-- Score ONU Global -->
+      <div class="bg-blue-950/50 p-2.5 rounded-xl border border-blue-500/30">
+        <div class="flex items-center justify-between">
+          <span class="text-[9px] uppercase font-bold text-blue-300">🌍 Accomplissement Planétaire ONU</span>
+          <span id="stat-onu-fraction" class="font-mono text-blue-200 font-black text-xs">2 / 195 pays</span>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden mt-1.5">
+          <div id="stat-onu-bar" class="bg-gradient-to-r from-blue-500 to-cyan-400 h-full rounded-full transition-all duration-300" style="width: 1.03%;"></div>
+        </div>
+        <div class="text-[9px] text-slate-400 mt-1 flex justify-between">
+          <span>Terre débloquée</span>
+          <span id="stat-onu-pct" class="font-bold text-cyan-300">1,03%</span>
+        </div>
+      </div>
+
+      <!-- Progression par Continents -->
+      <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800 space-y-1.5">
+        <div class="text-[9px] uppercase font-bold text-indigo-300 tracking-wider">Pénétration par Continents</div>
+        <div id="stat-continents-container" class="space-y-1.5"></div>
+      </div>
+    </div>
+
+    <!-- Onglet 2 : Subdivisions Territoriales (France, Égypte, etc.) -->
+    <div id="tab-content-subdiv" class="space-y-2 text-xs hidden">
+      <div class="text-[9px] text-slate-400 leading-tight">
+        Taux d'exploration des maillages administratifs officiels de premier ordre.
+      </div>
+      <div id="stat-subdivisions-list" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar-indigo pr-1"></div>
+    </div>
+  </div>
+
+  <!-- POPUP 3 : KILOMÉTRAGE DIFFÉRENCIÉ (AVION / ROUTE / MER) -->
+  <div id="modal-odyssey" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-72 sm:w-80 rounded-2xl p-3.5 shadow-2xl hidden border border-cyan-500/50">
+    <div class="flex items-center justify-between pb-2 mb-2 border-b border-cyan-500/30">
+      <div class="flex items-center gap-1.5 text-cyan-200 text-xs font-bold uppercase tracking-wider">
+        <i class="fa-solid fa-route text-cyan-400"></i>
+        <span>Kilométrage Différencié</span>
+      </div>
+      <button onclick="closeAllPopups()" class="text-slate-400 hover:text-white text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="space-y-2 text-xs">
+      <!-- Distance totale explorée -->
+      <div class="bg-cyan-950/40 p-2.5 rounded-xl border border-cyan-500/30">
+        <div class="text-[9px] uppercase font-bold text-cyan-300 flex items-center justify-between">
+          <span><i class="fa-solid fa-gauge-high mr-1"></i> Distance Cumulée Explorée</span>
+          <span id="stat-odyssey-total-km" class="font-mono text-cyan-200 font-black text-xs">0 km</span>
+        </div>
+        <div class="text-[9px] text-slate-400 mt-1">Rayon combiné d'expéditions depuis la Corse.</div>
+      </div>
+
+      <!-- Répartition par Mode de Transport -->
+      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 space-y-2">
+        <div class="text-[9px] uppercase font-bold text-slate-300 tracking-wider">Modes de Transport</div>
+        
+        <!-- Avion -->
+        <div class="space-y-0.5">
+          <div class="flex justify-between items-center text-[10px]">
+            <span class="text-blue-300 font-medium"><i class="fa-solid fa-plane-departure mr-1 text-blue-400"></i> Aérien (Avion)</span>
+            <span id="stat-km-air" class="font-mono text-white font-bold">0 km</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
+            <div id="stat-bar-air" class="bg-blue-500 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Route & Rando -->
+        <div class="space-y-0.5">
+          <div class="flex justify-between items-center text-[10px]">
+            <span class="text-emerald-300 font-medium"><i class="fa-solid fa-car mr-1 text-emerald-400"></i> Terrestre (Route & Rando)</span>
+            <span id="stat-km-road" class="font-mono text-white font-bold">0 km</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
+            <div id="stat-bar-road" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Bateau / Croisière -->
+        <div class="space-y-0.5">
+          <div class="flex justify-between items-center text-[10px]">
+            <span class="text-cyan-300 font-medium"><i class="fa-solid fa-ship mr-1 text-cyan-400"></i> Navigation (Nil & Mer)</span>
+            <span id="stat-km-sea" class="font-mono text-white font-bold">0 km</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
+            <div id="stat-bar-sea" class="bg-cyan-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP 4 : ALTIMÈTRE DES EXTRÊMES & BAROMÈTRE DES ÎLES -->
+  <div id="modal-altitude" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-72 sm:w-80 rounded-2xl p-3.5 shadow-2xl hidden border border-emerald-500/50">
+    <div class="flex items-center justify-between pb-2 mb-2 border-b border-emerald-500/30">
+      <div class="flex items-center gap-1.5 text-emerald-200 text-xs font-bold uppercase tracking-wider">
+        <i class="fa-solid fa-mountain-sun text-emerald-400"></i>
+        <span>Altimètre & Îles</span>
+      </div>
+      <button onclick="closeAllPopups()" class="text-slate-400 hover:text-white text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="space-y-2 text-xs">
+      <!-- Le Grand Écart Vertical -->
+      <div class="grid grid-cols-2 gap-1.5">
+        <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+          <div class="text-[8px] uppercase font-bold text-emerald-400 flex items-center gap-1">
+            <i class="fa-solid fa-arrow-up-right-dots"></i> Zénith (Toit)
+          </div>
+          <div id="stat-alt-max-val" class="text-xs font-black text-white font-mono mt-0.5">0 m</div>
+          <div id="stat-alt-max-name" class="text-[9px] text-slate-300 truncate mt-0.5"></div>
+        </div>
+
+        <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+          <div class="text-[8px] uppercase font-bold text-cyan-400 flex items-center gap-1">
+            <i class="fa-solid fa-water"></i> Nadir (Plancher)
+          </div>
+          <div id="stat-alt-min-val" class="text-xs font-black text-white font-mono mt-0.5">0 m</div>
+          <div id="stat-alt-min-name" class="text-[9px] text-slate-300 truncate mt-0.5"></div>
+        </div>
+      </div>
+
+      <!-- Amplitude Verticale Totale -->
+      <div class="bg-emerald-950/40 p-2 rounded-xl border border-emerald-500/30 flex items-center justify-between">
+        <div>
+          <div class="text-[9px] uppercase font-bold text-emerald-300">Amplitude Verticale Conquise</div>
+          <div class="text-[9px] text-slate-400">Du fond récifal aux crêtes montagnardes</div>
+        </div>
+        <span id="stat-alt-amplitude" class="font-mono text-emerald-200 font-black text-xs">0 m</span>
+      </div>
+
+      <!-- Baromètre Îles vs Continent -->
+      <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800 space-y-1">
+        <div class="flex justify-between items-center text-[9px] font-bold">
+          <span class="text-cyan-300"><i class="fa-solid fa-umbrella-beach mr-1"></i> Terres Insulaires : <span id="stat-islands-pct">0%</span></span>
+          <span class="text-amber-300">Continent : <span id="stat-mainland-pct">0%</span> <i class="fa-solid fa-earth-europe ml-1"></i></span>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden flex">
+          <div id="stat-bar-islands" class="bg-cyan-500 h-full transition-all duration-300" style="width: 50%;"></div>
+          <div id="stat-bar-mainland" class="bg-amber-600 h-full transition-all duration-300" style="width: 50%;"></div>
+        </div>
+        <div id="stat-islands-note" class="text-[9px] text-slate-400 italic mt-0.5"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP 5 : CHRONO-SCOPE (FRISE DES CIVILISATIONS) & UNESCO -->
+  <div id="modal-chrono" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-72 sm:w-80 rounded-2xl p-3.5 shadow-2xl hidden border border-indigo-500/50">
+    <div class="flex items-center justify-between pb-2 mb-2 border-b border-indigo-500/30">
+      <div class="flex items-center gap-1.5 text-indigo-200 text-xs font-bold uppercase tracking-wider">
+        <i class="fa-solid fa-hourglass-half text-indigo-400"></i>
+        <span>Chrono-Scope & UNESCO</span>
+      </div>
+      <button onclick="closeAllPopups()" class="text-slate-400 hover:text-white text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="space-y-2 text-xs">
+      <!-- Patrimoine UNESCO -->
+      <div class="bg-indigo-950/60 p-2 rounded-xl border border-indigo-500/30 flex items-center justify-between">
+        <div>
+          <div class="text-[9px] uppercase font-bold text-indigo-300">Trésors UNESCO Visités</div>
+          <div class="text-[9px] text-slate-400 mt-0.5"><span id="stat-unesco-count-val" class="font-bold text-indigo-200 font-mono">0</span> sites classés (<span id="stat-unesco-pct-val" class="font-bold text-indigo-200">0%</span> du carnet)</div>
+        </div>
+        <div class="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center font-mono font-black text-indigo-300 text-xs">
+          🏛️
+        </div>
+      </div>
+
+      <!-- Frise Chronologique des Civilisations -->
+      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 space-y-1.5">
+        <div class="text-[9px] uppercase font-bold text-slate-300 tracking-wider">Époques Traversées (+3 500 ans)</div>
+        <div id="stat-chrono-breakdown" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar-indigo pr-1"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Volet gauche des filtres (compact et calibré pour nombres à 3 chiffres) -->
   <aside id="left-dock" class="absolute top-16 left-3 z-30 flex items-start pointer-events-auto">
     <div class="flex items-start">
       <div id="filters-panel" class="glass-panel rounded-2xl p-2.5 shadow-2xl w-48 sm:w-52 overflow-y-auto custom-scrollbar panel-transition relative max-h-[calc(100vh-6rem)]">
-        <!-- Ligne unique d'en-tête de filtre -->
         <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-700/60">
           <div class="flex items-center gap-1">
             <i class="fa-solid fa-filter text-cyan-400 text-[10px]"></i>
@@ -205,23 +536,33 @@
             <button onclick="toggleFiltersPanel()" class="ml-0.5 text-slate-400 hover:text-white text-[10px]" title="Replier les filtres"><i class="fa-solid fa-chevron-left"></i></button>
           </div>
         </div>
-        <!-- Liste unifiée catégories condensée -->
         <div id="unified-category-list" class="space-y-1 text-xs"></div>
       </div>
 
-      <!-- Bouton d'ouverture quand replié -->
       <button id="btn-open-filters" onclick="toggleFiltersPanel()" class="glass-panel hidden px-2 py-3 rounded-xl text-cyan-400 hover:text-white text-xs shadow-2xl flex items-center justify-center ml-1" title="Ouvrir les filtres">
         <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>
   </aside>
 
-  <!-- Volet d'information réduit de moitié en largeur avec ascenseur -->
+  <!-- Volet d'information du site sélectionné avec Navigation Précédent / Suivant -->
   <section id="destination-card" class="absolute top-16 right-3 z-40 glass-panel rounded-2xl p-3 shadow-2xl border border-cyan-500/40 hidden pointer-events-auto transition-all duration-300 w-[270px] sm:w-[285px] flex flex-col justify-between max-h-[calc(100vh-5rem)] overflow-y-auto custom-scrollbar">
-    <div class="relative flex flex-col gap-2.5">
-      <button onclick="closeSpotCard()" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-[10px] transition z-10 border border-slate-700">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+    <div class="relative flex flex-col gap-2">
+      <!-- Barre d'outils du haut : Navigation ◀ / ▶ et Fermeture -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1">
+          <button onclick="navigateSpot(-1)" class="w-6 h-6 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 flex items-center justify-center text-[10px] border border-slate-700 transition" title="Lieu précédent">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <span id="card-spot-index" class="text-[9px] font-mono text-slate-400 px-1">1 / 15</span>
+          <button onclick="navigateSpot(1)" class="w-6 h-6 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 flex items-center justify-center text-[10px] border border-slate-700 transition" title="Lieu suivant">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+        <button onclick="closeSpotCard()" class="w-6 h-6 rounded-lg bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-[10px] transition border border-slate-700">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
 
       <!-- En-tête Pays & Région -->
       <div id="card-geo-header" class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900/80 border border-slate-800/80 text-[11px] font-medium text-slate-300">
@@ -229,20 +570,25 @@
         <span id="card-country-region" class="truncate font-semibold text-white"></span>
       </div>
 
-      <!-- Image du site compacte -->
+      <!-- Image du site -->
       <div class="w-full h-32 rounded-xl overflow-hidden bg-slate-900 shrink-0 relative border border-slate-700/50">
         <img id="card-img" src="" alt="Aperçu destination" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x200/0f172a/38bdf8?text=Voyage'">
       </div>
 
-      <!-- Étiquettes catégories -->
+      <!-- Badges catégories -->
       <div id="card-photo-tags" class="flex flex-wrap items-center gap-1 min-h-[22px]"></div>
 
-      <!-- Titre & Coordonnées -->
+      <!-- Titre & Coordonnées GPS avec copie en 1 clic -->
       <div class="flex flex-col gap-0.5">
-        <h3 id="card-title" class="text-xs font-bold text-white pr-3 leading-snug"></h3>
-        <p id="card-location" class="text-[9px] text-cyan-400 font-medium flex items-center gap-1">
-          <i class="fa-solid fa-location-dot"></i> <span></span>
-        </p>
+        <h3 id="card-title" class="text-xs font-bold text-white pr-1 leading-snug"></h3>
+        <div class="flex items-center justify-between">
+          <p id="card-location" class="text-[9px] text-cyan-400 font-medium flex items-center gap-1">
+            <i class="fa-solid fa-location-dot"></i> <span></span>
+          </p>
+          <button onclick="copyCurrentGPS()" class="text-[9px] text-slate-400 hover:text-cyan-300 transition flex items-center gap-1" title="Copier les coordonnées GPS">
+            <i class="fa-regular fa-copy"></i> <span id="copy-gps-feedback">GPS</span>
+          </button>
+        </div>
       </div>
 
       <!-- Section 1 : Introduction -->
@@ -255,7 +601,7 @@
 
       <!-- Section 2 : À visiter / Incontournables -->
       <div class="flex flex-col gap-1 bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">
-        <div class="text-[9px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+        <div class="text-[9px] font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1">
           <i class="fa-solid fa-compass"></i> À visiter & Incontournables
         </div>
         <p id="card-visiter" class="text-[10px] text-slate-300 leading-relaxed pr-1"></p>
@@ -264,11 +610,17 @@
 
     <!-- Boutons d'action -->
     <div class="flex flex-col gap-1.5 pt-2 border-t border-slate-700/60 mt-2.5">
-      <a id="card-link" href="#" target="_blank" rel="noopener noreferrer" class="w-full py-1.5 px-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-[10px] font-semibold flex items-center justify-center gap-1 shadow-md shadow-cyan-500/20 transition">
-        <i class="fa-solid fa-images text-[9px]"></i>
-        <span>Voir l'album</span>
-        <i class="fa-solid fa-arrow-up-right-from-square text-[8px] opacity-75"></i>
-      </a>
+      <div class="grid grid-cols-2 gap-1.5">
+        <a id="card-link" href="#" target="_blank" rel="noopener noreferrer" class="py-1.5 px-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-[10px] font-semibold flex items-center justify-center gap-1 shadow transition">
+          <i class="fa-solid fa-images text-[9px]"></i>
+          <span>Album</span>
+        </a>
+        <a id="card-gmaps-link" href="#" target="_blank" rel="noopener noreferrer" class="py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-semibold flex items-center justify-center gap-1 border border-slate-700 transition" title="Voir l'itinéraire sur Google Maps">
+          <i class="fa-solid fa-route text-[9px] text-emerald-400"></i>
+          <span>Itinéraire</span>
+        </a>
+      </div>
+
       <button id="card-btn-mode-toggle" onclick="toggleCurrentSpotViewMode()" class="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-[10px] font-medium flex items-center justify-center gap-1 border border-slate-700 transition">
         <i id="card-btn-icon" class="fa-solid fa-map-location-dot text-cyan-400 text-[9px]"></i>
         <span id="card-btn-label">Explorer en 2D</span>
@@ -276,12 +628,13 @@
     </div>
   </section>
 
+  <!-- Boutons de commande en bas à gauche -->
   <div class="absolute bottom-4 left-3 z-30 flex flex-col gap-1.5 pointer-events-auto">
     <button id="btn-toggle-tiles" onclick="toggleMapTileLayer()" class="glass-panel w-9 h-9 rounded-xl flex items-center justify-center text-cyan-300 hover:text-white transition shadow-lg hidden" title="Basculer Satellite / Topo">
       <i class="fa-solid fa-layer-group text-xs"></i>
     </button>
     <button id="btn-toggle-rotate" onclick="toggleGlobeAutoRotate()" class="glass-panel w-9 h-9 rounded-xl flex items-center justify-center text-cyan-300 hover:text-white transition shadow-lg" title="Activer / Arrêter la rotation">
-      <i id="icon-auto-rotate" class="fa-solid fa-pause text-xs"></i>
+      <i id="icon-auto-rotate" class="fa-solid fa-play text-xs"></i>
     </button>
     <button onclick="zoomMapIn()" class="glass-panel w-9 h-9 rounded-xl flex items-center justify-center text-slate-200 hover:text-white transition shadow-lg" title="Zoom avant">
       <i class="fa-solid fa-plus text-xs"></i>
@@ -292,13 +645,49 @@
   </div>
 
   <script>
+    // Coordonnées du Foyer / Base d'exploration (Castellare-di-Casinca, Corse)
+    const HOME_BASE = {
+      name: "Castellare-di-Casinca",
+      lat: 42.4678,
+      lng: 9.4756
+    };
+
+    // Nombre total de pays reconnus par l'ONU
+    const TOTAL_UN_COUNTRIES = 195;
+
+    // Référentiel des continents
+    const CONTINENT_TOTALS = {
+      "Europe": 44,
+      "Afrique": 54,
+      "Asie": 48,
+      "Amériques": 35,
+      "Océanie": 14
+    };
+
+    // Totaux administratifs de premier ordre par pays
+    const COUNTRY_SUBDIV_TOTALS = {
+      "France": { type: "Départements", total: 101, regionType: "Régions", regionTotal: 18 },
+      "Égypte": { type: "Gouvernorats", total: 27 },
+      "Allemagne": { type: "Länder", total: 16 },
+      "Italie": { type: "Régions", total: 20 },
+      "Espagne": { type: "Communautés", total: 17 },
+      "États-Unis": { type: "États", total: 50 }
+    };
+
     const travelSpots = [
       {
         id: "hurghada",
         name: "Hurghada (Mer Rouge)",
         region: "Gouvernorat de la Mer-Rouge",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Mer-Rouge",
+        altitude: -2,
+        is_island: false,
+        transport: "avion",
+        era_group: "contemporain",
+        era_label: "Époque Contemporaine & Récif Géologique",
         category: "plage",
         counts: { plage: 1 },
         lat: 27.2579,
@@ -313,7 +702,14 @@
         name: "Charm el-Naga",
         region: "Gouvernorat de la Mer-Rouge",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Mer-Rouge",
+        altitude: -5,
+        is_island: false,
+        transport: "route",
+        era_group: "nature",
+        era_label: "Temps Géologique & Corallien",
         category: "plage",
         counts: { plage: 1 },
         lat: 27.0250,
@@ -328,7 +724,14 @@
         name: "Abou Simbel",
         region: "Gouvernorat d'Assouan",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Assouan",
+        altitude: 185,
+        is_island: false,
+        transport: "avion",
+        era_group: "pharaonique",
+        era_label: "Antiquité Pharaonique (-1264 av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 22.3372,
@@ -343,13 +746,20 @@
         name: "Louxor - Temple de Séti Ier (Gournah)",
         region: "Gouvernorat de Louxor",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Louxor",
+        altitude: 82,
+        is_island: false,
+        transport: "route",
+        era_group: "pharaonique",
+        era_label: "Antiquité Pharaonique (-1290 av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 25.7328,
         lng: 32.6281,
         image: "https://lh3.googleusercontent.com/pw/AP1GczOCn3bnnRckhB2Ac1shOqlfDJfH3SfpYo6esxwODD6rK-dCQksCm6dsSFRbh-V9oMtoOaUJ43Heywro5BI2G7w9FKqOYKowO3AFdi_xiwfzEo_O90EXFb0uBT7VJTgZZ0KPmynrdDdmiF73ZTJTnNHSwA=w2884-h1922-s-no-gm?authuser=0",
-        description: "Magnifique temple des millions d'années érigé sur la rive ouest de Louxor par le pharaon Séti Ier et achevé par son fils Ramsès II au cœur de la nécropole thébaine. Ce sanctuaire commémoratif et funéraire est dédié au culte du roi ainsi qu'au dieu Amon-Rê. Bien que partiellement ruiné dans sa partie orientale, il conserve des salles hypostyles remarquables, des chapelles richement décorées de bas-reliefs d'une grande finesse artistique et un plan architectural architecturalement pionnier pour l'époque.",
+        description: "Magnifique temple des millions d'années érigé sur la rive ouest de Louxor par le pharaon Séti Ier et achevé par son fils Ramsès II au cœur de la nécropole thébaine. Ce sanctuaire commémoratif et funéraire est dédié au culte du roi ainsi qu'au dieu Amon-Rê. Bien que partiellement ruiné dans sa partie orientale, il conserve des salles hypostyles remarquables, des chapelles richement décorées de bas-reliefs d'une grande finesse artistique et un plan architectural pionnier pour l'époque.",
         visiter: "L'exploration de l'enceinte permet d'admirer les colonnes papyracées de la salle hypostyle ainsi que les chapelles dédiées aux principales divinités et aux ancêtres royaux. Les murs préservés dévoilent des scènes rituelles et des offrandes polychromes caractéristiques du Nouvel Empire. Situé à l'entrée nord de la nécropole thébaine, le site offre un cadre calme et privilégié pour s'imprégner de l'art pharaonique loin des afflux touristiques majeurs.",
         link: "https://photos.google.com/share/AF1QipNzr_Fg6pFcitaIuS-gzg2QB15dXmm1sscmdynudrfrm9IAbsZniv6hC3TYPgAMmQ?key=c3Y0bnRPWGR6MGZCOHpQUUdCRU9WQmJkbC1tVUtn"
       },
@@ -358,7 +768,14 @@
         name: "Temple de Louxor (Amon)",
         region: "Gouvernorat de Louxor",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Louxor",
+        altitude: 76,
+        is_island: false,
+        transport: "route",
+        era_group: "pharaonique",
+        era_label: "Antiquité Pharaonique (-1400 av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 25.6994,
@@ -373,7 +790,14 @@
         name: "Musée de Louxor",
         region: "Gouvernorat de Louxor",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Louxor",
+        altitude: 75,
+        is_island: false,
+        transport: "route",
+        era_group: "contemporain",
+        era_label: "Époque Contemporaine (1975)",
         category: "musee",
         counts: { musee: 1 },
         lat: 25.6983,
@@ -388,7 +812,14 @@
         name: "Temple de Kom Ombo",
         region: "Gouvernorat d'Assouan",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Assouan",
+        altitude: 90,
+        is_island: false,
+        transport: "bateau",
+        era_group: "ptolemaique",
+        era_label: "Période Ptolémaïque (-180 av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 24.4536,
@@ -403,7 +834,14 @@
         name: "Temple d'Edfou (Horus)",
         region: "Gouvernorat d'Assouan",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Assouan",
+        altitude: 85,
+        is_island: false,
+        transport: "bateau",
+        era_group: "ptolemaique",
+        era_label: "Période Ptolémaïque (-237 av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 24.9778,
@@ -414,71 +852,18 @@
         link: "https://photos.google.com/share/AF1QipNqbMqY_-InIkAJX9cPCrdTcJxd05Ei8zaKJYCjHGXrIGOmW3MY9HfCRdYEbiU_2g?key=ZlFTdkRzMzVrTDh4WmZtRjVFZEVVbHlCQ2RmM0xR"
       },
       {
-        id: "lac_de_nino",
-        name: "Lac de Nino & Pozzi",
-        region: "Haute-Corse (Massif du Rotondo)",
-        country: "France",
-        flag: "🇫🇷",
-        category: "lac",
-        counts: { lac: 1, rando: 1, parc_naturel: 1 },
-        lat: 42.2575,
-        lng: 8.9405,
-        image: "https://lh3.googleusercontent.com/pw/AP1GczOffslg_xvJ4kz3UwA46OCvLiQQ8HgO5_n6LBl4EchL5DDN_DeEkv4EzGRseb3NlTtyLxSXmYezSfQEZhddBZDGpPRyCNKT7Ae_d0KGx89OuDQUCUbU6TbO08b1EsR20nJyjUU2By4_zk96E43aOV2iqQ=w2318-h1546-s-no-gm?authuser=0",
-        description: "Perché à 1 743 mètres d'altitude au cœur du Parc Naturel Régional de Corse et dominé par les crêtes granitiques du massif du Rotondo, le lac de Nino constitue l'un des joyaux naturels les plus emblématiques de l'île de Beauté. Ce vaste lac glaciaire s'étend au milieu d'un plateau d'altitude tapissé de pozzines verdoyantes, véritables pelouses tourbeuses constellées de trous d'eau reliés par de délicats méandres scintillants. Véritable oasis suspendue entre ciel et montagne le long du mythique sentier du GR20, le site offre un spectacle féerique où paissent paisiblement en semi-liberté des chevaux insulaires sauvages accompagnés de leurs poulains. Le contraste saisissant entre la douceur des pelouses spongieuses, la limpidité des eaux calmes et l'austérité minérale des parois rocheuses environnantes confère à cet écrin préservé une atmosphère empreinte d'une poésie et d'une sérénité incomparables.",
-        visiter: "L'accès pédestre à ce sanctuaire d'altitude s'effectue principalement depuis la maison forestière de Popaghja dans la forêt territoriale de Valdu Niellu, ou via une traversée spectaculaire par le col de Vergio et la crête de Bocca a Reta. L'ascension débute à l'ombre bienfaisante des grands pins laricio avant de déboucher sur un univers minéral et grandiose récompensé par un panorama exceptionnel s'étirant jusqu'au golfe de Sagone et aux sommets environnants. Sur place, la découverte se poursuit en longeant avec précaution les berges herbeuses et les pozzines afin de préserver cet écosystème montagnard d'une grande fragilité, tout en observant à distance respectueuse la harde de chevaux sauvages en pâture. La luminosité changeante au fil de la journée sublime les reflets des crêtes dans le miroir d'eau, invitant à une halte contemplative inoubliable au cœur des grands espaces corses.",
-        link: "https://photos.google.com/share/AF1QipOcHfU1z-tymFZfCQ5g7e273NPu_R8fhW62j5S8mqfHfOE8BK_jxQ79ANOfhH5n0Q?key=WVpIbVlIbXNrREllVTFMSVk0UmFnVWV6ZlpzZWJn"
-      },
-      {
-        id: "giverny_maison_monet",
-        name: "Giverny & Maison de Claude Monet",
-        region: "Normandie (Eure)",
-        country: "France",
-        flag: "🇫🇷",
-        category: "ville",
-        counts: { ville: 1 },
-        lat: 49.0753,
-        lng: 1.5337,
-        image: "https://lh3.googleusercontent.com/pw/AP1GczNzF8a6tNABa-f5GaaYsOwVKQNRnGJWizJSr0pAzoBSI0Q4TvXI1pqtPLD9rBhsU98gYbPid5H40jhwo_u62N8-XTqM007sOoYIyg07iepWzLIVHBfAXnK5WY-4WNPfkOaeaasy_VOtA-ft3E7TlDpvVw=w2441-h1627-s-no-gm?authuser=0",
-        description: "Blotti sur les coteaux verdoyants de la vallée de la Seine aux confins de la Normandie et de l'Île-de-France, le village bucolique de Giverny incarne le sanctuaire vivant de l'impressionnisme mondial. C'est dans ce décor préservé que le maître de la lumière, Claude Monet, choisit d'établir sa demeure et son atelier en 1883, fasciné par les subtiles variations atmosphériques et la pureté des reflets d'eau environnants. Entourée d'un somptueux écrin floral sans cesse renouvelé, sa célèbre maison au crépi rose et aux volets vert pomme dialogue harmonieusement avec le Clos Normand, véritable tableau végétal conçu comme une palette vivante à ciel ouvert. Plus bas, par-delà les voies, le jardin d'eau d'inspiration orientale révèle son iconique pont japonais drapé de glycines et son étang orné des célèbres nymphéas qui ont immortalisé son œuvre ultime. Les ruelles fleuries du village, bordées de vieilles bâtisses en pierre calcaire et d'anciennes dépendances artistiques, conservent intacte cette atmosphère poétique où la nature et l'art pictural se confondent dans une harmonie sensorielle intemporelle.",
-        visiter: "La découverte débute par la visite intimiste de la maison de l'artiste, dont les pièces chaleureuses aux teintes vives restituent fidèlement le cadre de vie du peintre, depuis la lumineuse cuisine carrelée de bleu de Rouen jusqu'à l'impressionnante collection d'estampes japonaises ornant la salle à manger jaune d'or. La promenade se prolonge à travers les allées rectilignes du Clos Normand où foisonnent roses, capucines, tulipes et iris agencés selon un savant jeu de teintes et de volumes. En empruntant le passage souterrain, les visiteurs découvrent le féerique jardin d'eau, lieu de contemplation bercé par les frémissements des bambous et les reflets mouvants des nénuphars sur le miroir aquatique. Une flânerie dans le village permet ensuite de remonter la rue Claude Monet pour visiter le Musée des Impressionnismes et son jardin paysager contemporain, avant de se recueillir devant la tombe du peintre dans le paisible cimetière de l'église Sainte-Radegonde, parachevant une immersion culturelle d'une rare élégance.",
-        link: "https://photos.google.com/share/AF1QipMrmXqbr4c_CdCIqjU36P_ojhe298d0xYErpGiiRFaHtNB6Zj-iIL9AfJCYRn-XZg?key=ZU1xVXFSMGROVDJTYlE5Q0ZJSXpjMl9odzJjcDB3"
-      },
-      {
-        id: "cascade_pont_bucatoghju",
-        name: "Cascade & Pont génois du Bucatoghju",
-        region: "Haute-Corse (Costa Verde)",
-        country: "France",
-        flag: "🇫🇷",
-        category: "cascade",
-        counts: { cascade: 1, rando: 1 },
-        lat: 42.3585,
-        lng: 9.5085,
-        image: "https://lh3.googleusercontent.com/pw/AP1GczNrsUFdD0qItTqvLjxxr-mtuoXqc_8g4crUQGLnmXt7hAUfoVXrp-MdsOEQqj1TAC2WXu7VRHUZcXHMeABVJCzEhGLZ2wkeEqlo_wOL4I090xq9ikLGa--M3Z1LEGHRUxZvJnsbTOdxr05oRY8RTgdseg=w2441-h1627-s-no-gm?authuser=0",
-        description: "Niché sur les contreforts orientaux de la Castagniccia au cœur de la verdoyante région de la Costa Verde, le site du Bucatoghju dévoile une harmonie saisissante entre patrimoine d'ingénierie historique et nature insulaire préservée. Encaissé dans une gorge sauvage entre Santa-Maria-Poggio et San-Nicolao, le torrent bondissant du Bucatoghju se fraie un passage impétueux à travers les parois de schiste pour donner naissance à une succession de cascades impétueuses et de vasques cristallines aux reflets émeraude. Fièrement campé au-dessus des eaux vives depuis des siècles, le remarquable pont génois à arche unique en pierres sèches témoigne de l'antique voie de communication pastorale qui reliait jadis les communautés villageoises perchées aux plaines fertiles de la côte tyrrhénienne. Entouré d'une dense châtaigneraie, d'aulnes ombragés et d'un maquis odorant qui embaume l'air humide des sous-bois, cet écrin de fraîcheur offre un contraste saisissant avec la douceur du littoral marin tout proche, invitant à une parenthèse enchantée au son apaisant du ruissellement continu de la rivière.",
-        visiter: "La découverte de ce site emblématique s'articule autour d'un agréable itinéraire pédestre ombragé et très accessible, cheminant au fil de l'eau entre ponts de pierre et berges moussues. Le parcours franchit le pont génois du Bucatoghju avant de remonter le long du lit du cours d'eau pour atteindre les piscines naturelles propices à des haltes de baignade vivifiantes durant la période estivale. Les randonneurs plus aguerris pourront poursuivre la marche en boucle pour découvrir les vestiges du hameau en ruine de Raghja, la chapelle Saint-Pancrace ou monter vers les tunnels de la corniche découvrant la célèbre cascade de l'Ucelluline et ses panoramas spectaculaires plongeant directement vers la mer Tyrrhénienne. Des passages aménagés sur des rondins et des galets ponctuent la progression au cœur d'une végétation luxuriante où la lumière filtre délicatement à travers les frondaisons. Cette balade constitue une immersion idéale pour les familles comme pour les passionnés d'histoire corse désireux d'associer fraîcheur montagnarde et découverte patrimoniale.",
-        link: "https://photos.google.com/share/AF1QipPPgIE0CNEMhbKL0s6wFIjQQ5PsVF0DmZsFf82B0Z5jUUzkl29-fpUDw9woAze_aA?key=VEYwVzBzcldLd24tUzR1Y0VyeVFpQVlwWlpkMG9R"
-      },
-      {
-        id: "farinole_sentier_douaniers",
-        name: "Farinole & Sentier des Douaniers",
-        region: "Haute-Corse (Cap Corse)",
-        country: "France",
-        flag: "🇫🇷",
-        category: "rando",
-        counts: { rando: 1, plage: 1 },
-        lat: 42.7319,
-        lng: 9.3428,
-        image: "https://lh3.googleusercontent.com/pw/AP1GczMJZxrY8toY64F7BFxDsmqaxYEDxY9HN9b2NY0rMk8xnLUHSsgd4TdQ2ucSKJjdzSCqaIpEnSFMS2gvFbz5zysBVivKQXiCAyGLmdhIMzkrV7rk3SMrZczJkJnnlN3T3zxd23xpiDrEz1Ppvupq_1YZBg=w2948-h2219-s-no-gm?authuser=0",
-        description: "Sentinelle sauvage dressée sur le littoral occidental du Cap Corse entre Patrimonio et Nonza, Farinole déploie une côte rocheuse tourmentée où la rudesse du schiste vert et des falaises plonge directement dans les flots turquoise de la Méditerranée. Témoin privilégié de l'histoire maritime insulaire, la tour génoise ronde bâtie en 1562 veille sur les anses marines et les déferlantes qui viennent fouetter les galets polis et le sable ocre du rivage. Le sentier des douaniers qui serpente à fleur de crête et en corniche offre une immersion totale dans les parfums entêtants de myrte, d'immortelle et de lentisque courbés par les embruns marins. Les contrastes chromatiques y sont d'une intensité saisissante, mêlant le bleu profond du grand large, la verdure argentée du maquis littoral et les nuances sombres des affleurements rocheux balayés par le vent d'ouest. Cet écrin naturel remarquablement préservé incarne la beauté brute et indomptée des marines corses, où chaque crique isolée murmure les récits séculaires des guetteurs d'autrefois.",
-        visiter: "L'itinéraire pédestre s'aborde idéalement depuis la marine de Farinole ou les abords de la tour génoise pour longer les reliefs découpés surplombant les criques secrètes et les platiers rocheux du rivage. La marche en balcon dévoile des perspectives grandioses sur le golfe de Saint-Florent et les crêtes montagneuses du Nebbio se détachant à l'horizon. Les amateurs d'exploration marine trouveront dans les eaux cristallines bordant les récifs un terrain de jeu exceptionnel pour le snorkeling et la plongée, révélant une vie sous-marine foisonnante tapie entre tombants de roche et herbiers de posidonie. Les plages de sable et de galets invitent à des haltes de baignade vivifiantes dans une atmosphère paisible loin des fortes affluences. En fin de journée, l'exposition plein ouest transforme le littoral en un théâtre flamboyant où le soleil couchant embrase les tours côtières et la mer, offrant aux promeneurs une halte contemplative inoubliable au cœur du Cap Corse sauvage.",
-        link: "https://photos.google.com/share/AF1QipPxc5QdKcOU0QmdDvl5D9EF4pPEd0SIms-Nsinc6b5yLpoO369hYwpzX592PVZRNw?key=OWZVUnZLSk9kQWJJZS11ODg5VE52WmUxcEpxb3dB"
-      },
-      {
         id: "temple_esna",
         name: "Temple de Khnoum à Esna",
         region: "Gouvernorat de Louxor",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Louxor",
+        altitude: 80,
+        is_island: false,
+        transport: "bateau",
+        era_group: "ptolemaique",
+        era_label: "Période Gréco-Romaine (Ier-IIIe siècle)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 25.2934,
@@ -493,7 +878,14 @@
         name: "Temple de Philae",
         region: "Gouvernorat d'Assouan",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Assouan",
+        altitude: 110,
+        is_island: true,
+        transport: "bateau",
+        era_group: "ptolemaique",
+        era_label: "Période Ptolémaïque & Romaine (-380)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 24.0255,
@@ -508,7 +900,14 @@
         name: "Assouan & Île Éléphantine",
         region: "Gouvernorat d'Assouan",
         country: "Égypte",
+        continent: "Afrique",
         flag: "🇪🇬",
+        subdiv: "Assouan",
+        altitude: 105,
+        is_island: true,
+        transport: "bateau",
+        era_group: "pharaonique",
+        era_label: "Antiquité & Nubie Historique",
         category: "ville",
         counts: { ville: 1, musee: 1 },
         lat: 24.0889,
@@ -517,6 +916,98 @@
         description: "Porte historique de l'Égypte vers le sud, Assouan et l'île Éléphantine abritent des vestiges millénaires au milieu des eaux du Nil. Entre les temples sacrés, les nécropoles antiques et le musée de Nubie, ce site témoigne de la richesse fascinante de l'histoire pharaonique et nubienne. L'île respire une atmosphère paisible avec ses villages nubiens aux maisons colorées, ses vergers luxuriants et ses sites archéologiques millénaires racontant le commerce et les cultes de l'ancienne frontière.",
         visiter: "Les collections du Musée de Nubie présentent des pièces archéologiques de premier plan, tandis que les vestiges de l'ancienne cité d'Abou conservent un nilomètre antique creusé dans la roche. Les sentiers des villages nubiens offrent une immersion culturelle authentique, et les promenades fluviales en embarcation traditionnelle permettent de longer les rives rocheuses et les cataractes du Nil.",
         link: "https://photos.google.com/share/AF1QipNZfBT4M0PS4dNnwcK68X2Oia2tILgY86cyJSq9mDJ69FPcLPDkB9H4VMkFde2FiQ?key=bWVoRGE4X3E5dUxxVk81akd5Z3BtTzMtUm55aWx3"
+      },
+      {
+        id: "lac_de_nino",
+        name: "Lac de Nino & Pozzi",
+        region: "Haute-Corse (Massif du Rotondo)",
+        country: "France",
+        continent: "Europe",
+        flag: "🇫🇷",
+        subdiv: "Haute-Corse (2B)",
+        region_admin: "Corse",
+        altitude: 1743,
+        is_island: true,
+        transport: "route",
+        era_group: "nature",
+        era_label: "Ère Glaciaire & Temps Géologique",
+        category: "lac",
+        counts: { lac: 1, rando: 1, parc_naturel: 1 },
+        lat: 42.2575,
+        lng: 8.9405,
+        image: "https://lh3.googleusercontent.com/pw/AP1GczOffslg_xvJ4kz3UwA46OCvLiQQ8HgO5_n6LBl4EchL5DDN_DeEkv4EzGRseb3NlTtyLxSXmYezSfQEZhddBZDGpPRyCNKT7Ae_d0KGx89OuDQUCUbU6TbO08b1EsR20nJyjUU2By4_zk96E43aOV2iqQ=w2318-h1546-s-no-gm?authuser=0",
+        description: "Perché à 1 743 mètres d'altitude au cœur du Parc Naturel Régional de Corse et dominé par les crêtes granitiques du massif du Rotondo, le lac de Nino constitue l'un des joyaux naturels les plus emblématiques de l'île de Beauté. Ce vaste lac glaciaire s'étend au milieu d'un plateau d'altitude tapissé de pozzines verdoyantes, véritables pelouses tourbeuses constellées de trous d'eau reliés par de délicats méandres scintillants. Véritable oasis suspendue entre ciel et montagne le long du mythique sentier du GR20, le site offre un spectacle féerique où paissent paisiblement en semi-liberté des chevaux insulaires sauvages accompagnés de leurs poulains. Le contraste saisissant entre la douceur des pelouses spongieuses, la limpidité des eaux calmes et l'austérité minérale des parois rocheuses environnantes confère à cet écrin préservé une atmosphère empreinte d'une poésie et d'une sérénité incomparables.",
+        visiter: "L'accès pédestre à ce sanctuaire d'altitude s'effectue principalement depuis la maison forestière de Popaghja dans la forêt territoriale de Valdu Niellu, ou via une traversée spectaculaire par le col de Vergio et la crête de Bocca a Reta. L'ascension débute à l'ombre bienfaisante des grands pins laricio avant de déboucher sur un univers minéral et grandiose récompensé par un panorama exceptionnel s'étirant jusqu'au golfe de Sagone et aux sommets environnants. Sur place, la découverte se poursuit en longeant avec précaution les berges herbeuses et les pozzines afin de préserver cet écosystème montagnard d'une grande fragilité, tout en observant à distance respectueuse la harde de chevaux sauvages en pâture. La luminosité changeante au fil de la journée sublime les reflets des crêtes dans le miroir d'eau, invitant à une halte contemplative inoubliable au cœur des grands espaces corses.",
+        link: "https://photos.google.com/share/AF1QipOcHfU1z-tymFZfCQ5g7e273NPu_R8fhW62j5S8mqfHfOE8BK_jxQ79ANOfhH5n0Q?key=WVpIbVlIbXNrREllVTFMSVk0UmFnVWV6ZlpzZWJn"
+      },
+      {
+        id: "farinole_sentier_douaniers",
+        name: "Farinole & Sentier des Douaniers",
+        region: "Haute-Corse (Cap Corse)",
+        country: "France",
+        continent: "Europe",
+        flag: "🇫🇷",
+        subdiv: "Haute-Corse (2B)",
+        region_admin: "Corse",
+        altitude: 35,
+        is_island: true,
+        transport: "route",
+        era_group: "medievale",
+        era_label: "Époque Génoise (XVIe siècle - 1562)",
+        category: "rando",
+        counts: { rando: 1, plage: 1 },
+        lat: 42.7319,
+        lng: 9.3428,
+        image: "https://lh3.googleusercontent.com/pw/AP1GczMJZxrY8toY64F7BFxDsmqaxYEDxY9HN9b2NY0rMk8xnLUHSsgd4TdQ2ucSKJjdzSCqaIpEnSFMS2gvFbz5zysBVivKQXiCAyGLmdhIMzkrV7rk3SMrZczJkJnnlN3T3zxd23xpiDrEz1Ppvupq_1YZBg=w2948-h2219-s-no-gm?authuser=0",
+        description: "Sentinelle sauvage dressée sur le littoral occidental du Cap Corse entre Patrimonio et Nonza, Farinole déploie une côte rocheuse tourmentée où la rudesse du schiste vert et des falaises plonge directement dans les flots turquoise de la Méditerranée. Témoin privilégié de l'histoire maritime insulaire, la tour génoise ronde bâtie en 1562 veille sur les anses marines et les déferlantes qui viennent fouetter les galets polis et le sable ocre du rivage. Le sentier des douaniers qui serpente à fleur de crête et en corniche offre une immersion totale dans les parfums entêtants de myrte, d'immortelle et de lentisque courbés par les embruns marins. Les contrastes chromatiques y sont d'une intensité saisissante, mêlant le bleu profond du grand large, la verdure argentée du maquis littoral et les nuances sombres des affleurements rocheux balayés par le vent d'ouest. Cet écrin naturel remarquablement préservé incarne la beauté brute et indomptée des marines corses, où chaque crique isolée murmure les récits séculaires des guetteurs d'autrefois.",
+        visiter: "L'itinéraire pédestre s'aborde idéalement depuis la marine de Farinole ou les abords de la tour génoise pour longer les reliefs découpés surplombant les criques secrètes et les platiers rocheux du rivage. La marche en balcon dévoile des perspectives grandioses sur le golfe de Saint-Florent et les crêtes montagneuses du Nebbio se détachant à l'horizon. Les amateurs d'exploration marine trouveront dans les eaux cristallines bordant les récifs un terrain de jeu exceptionnel pour le snorkeling et la plongée, révélant une vie sous-marine foisonnante tapie entre tombants de roche et herbiers de posidonie. Les plages de sable et de galets invitent à des haltes de baignade vivifiantes dans une atmosphère paisible loin des fortes affluences. En fin de journée, l'exposition plein ouest transforme le littoral en un théâtre flamboyant où le soleil couchant embrase les tours côtières et la mer, offrant aux promeneurs une halte contemplative inoubliable au cœur du Cap Corse sauvage.",
+        link: "https://photos.google.com/share/AF1QipPxc5QdKcOU0QmdDvl5D9EF4pPEd0SIms-Nsinc6b5yLpoO369hYwpzX592PVZRNw?key=OWZVUnZLSk9kQWJJZS11ODg5VE52WmUxcEpxb3dB"
+      },
+      {
+        id: "cascade_pont_bucatoghju",
+        name: "Cascade & Pont génois du Bucatoghju",
+        region: "Haute-Corse (Costa Verde)",
+        country: "France",
+        continent: "Europe",
+        flag: "🇫🇷",
+        subdiv: "Haute-Corse (2B)",
+        region_admin: "Corse",
+        altitude: 240,
+        is_island: true,
+        transport: "route",
+        era_group: "medievale",
+        era_label: "Époque Génoise & Pastorale",
+        category: "cascade",
+        counts: { cascade: 1, rando: 1 },
+        lat: 42.3585,
+        lng: 9.5085,
+        image: "https://lh3.googleusercontent.com/pw/AP1GczNrsUFdD0qItTqvLjxxr-mtuoXqc_8g4crUQGLnmXt7hAUfoVXrp-MdsOEQqj1TAC2WXu7VRHUZcXHMeABVJCzEhGLZ2wkeEqlo_wOL4I090xq9ikLGa--M3Z1LEGHRUxZvJnsbTOdxr05oRY8RTgdseg=w2441-h1627-s-no-gm?authuser=0",
+        description: "Niché sur les contreforts orientaux de la Castagniccia au cœur de la verdoyante région de la Costa Verde, le site du Bucatoghju dévoile une harmonie saisissante entre patrimoine d'ingénierie historique et nature insulaire préservée. Encaissé dans une gorge sauvage entre Santa-Maria-Poggio et San-Nicolao, le torrent bondissant du Bucatoghju se fraie un passage impétueux à travers les parois de schiste pour donner naissance à une succession de cascades impétueuses et de vasques cristallines aux reflets émeraude. Fièrement campé au-dessus des eaux vives depuis des siècles, le remarquable pont génois à arche unique en pierres sèches témoigne de l'antique voie de communication pastorale qui reliait jadis les communautés villageoises perchées aux plaines fertiles de la côte tyrrhénienne. Entouré d'une dense châtaigneraie, d'aulnes ombragés et d'un maquis odorant qui embaume l'air humide des sous-bois, cet écrin de fraîcheur offre un contraste saisissant avec la douceur du littoral marin tout proche, invitant à une parenthèse enchantée au son apaisant du ruissellement continu de la rivière.",
+        visiter: "La découverte de ce site emblématique s'articule autour d'un agréable itinéraire pédestre ombragé et très accessible, cheminant au fil de l'eau entre ponts de pierre et berges moussues. Le parcours franchit le pont génois du Bucatoghju avant de remonter le long du lit du cours d'eau pour atteindre les piscines naturelles propices à des haltes de baignade vivifiantes durant la période estivale. Les randonneurs plus aguerris pourront poursuivre la marche en boucle pour découvrir les vestiges du hameau en ruine de Raghja, la chapelle Saint-Pancrace ou monter vers les tunnels de la corniche découvrant la célèbre cascade de l'Ucelluline et ses panoramas spectaculaires plongeant directement vers la mer Tyrrhénienne. Des passages aménagés sur des rondins et des galets ponctuent la progression au cœur d'une végétation luxuriante où la lumière filtre délicatement à travers les frondaisons. Cette balade constitue une immersion idéale pour les familles comme pour les passionnés d'histoire corse désireux d'associer fraîcheur montagnarde et découverte patrimoniale.",
+        link: "https://photos.google.com/share/AF1QipPPgIE0CNEMhbKL0s6wFIjQQ5PsVF0DmZsFf82B0Z5jUUzkl29-fpUDw9woAze_aA?key=VEYwVzBzcldLd24tUzR1Y0VyeVFpQVlwWlpkMG9R"
+      },
+      {
+        id: "giverny_maison_monet",
+        name: "Giverny & Maison de Claude Monet",
+        region: "Normandie (Eure)",
+        country: "France",
+        continent: "Europe",
+        flag: "🇫🇷",
+        subdiv: "Eure (27)",
+        region_admin: "Normandie",
+        altitude: 22,
+        is_island: false,
+        transport: "avion",
+        era_group: "contemporain",
+        era_label: "Époque Impressionniste (1883)",
+        category: "ville",
+        counts: { ville: 1 },
+        lat: 49.0753,
+        lng: 1.5337,
+        image: "https://lh3.googleusercontent.com/pw/AP1GczNzF8a6tNABa-f5GaaYsOwVKQNRnGJWizJSr0pAzoBSI0Q4TvXI1pqtPLD9rBhsU98gYbPid5H40jhwo_u62N8-XTqM007sOoYIyg07iepWzLIVHBfAXnK5WY-4WNPfkOaeaasy_VOtA-ft3E7TlDpvVw=w2441-h1627-s-no-gm?authuser=0",
+        description: "Blotti sur les coteaux verdoyants de la vallée de la Seine aux confins de la Normandie et de l'Île-de-France, le village bucolique de Giverny incarne le sanctuaire vivant de l'impressionnisme mondial. C'est dans ce décor préservé que le maître de la lumière, Claude Monet, choisit d'établir sa demeure et son atelier en 1883, fasciné par les subtiles variations atmosphériques et la pureté des reflets d'eau environnants. Entourée d'un somptueux écrin floral sans cesse renouvelé, sa célèbre maison au crépi rose et aux volets vert pomme dialogue harmonieusement avec le Clos Normand, véritable tableau végétal conçu comme une palette vivante à ciel ouvert. Plus bas, par-delà les voies, le jardin d'eau d'inspiration orientale révèle son iconique pont japonais drapé de glycines et son étang orné des célèbres nymphéas qui ont immortalisé son œuvre ultime. Les ruelles fleuries du village, bordées de vieilles bâtisses en pierre calcaire et d'anciennes dépendances artistiques, conservent intacte cette atmosphère poétique où la nature et l'art pictural se confondent dans une harmonie sensorielle intemporelle.",
+        visiter: "La découverte débute par la visite intimiste de la maison de l'artiste, dont les pièces chaleureuses aux teintes vives restituent fidèlement le cadre de vie du peintre, depuis la lumineuse cuisine carrelée de bleu de Rouen jusqu'à l'impressionnante collection d'estampes japonaises ornant la salle à manger jaune d'or. La promenade se prolonge à travers les allées rectilignes du Clos Normand où foisonnent roses, capucines, tulipes et iris agencés selon un savant jeu de teintes et de volumes. En empruntant le passage souterrain, les visiteurs découvrent le féerique jardin d'eau, lieu de contemplation bercé par les frémissements des bambous et les reflets mouvants des nénuphars sur le miroir aquatique. Une flânerie dans le village permet ensuite de remonter la rue Claude Monet pour visiter le Musée des Impressionnismes et son jardin paysager contemporain, avant de se recueillir devant la tombe du peintre dans le paisible cimetière de l'église Sainte-Radegonde, parachevant une immersion culturelle d'une rare élégance.",
+        link: "https://photos.google.com/share/AF1QipMrmXqbr4c_CdCIqjU36P_ojhe298d0xYErpGiiRFaHtNB6Zj-iIL9AfJCYRn-XZg?key=ZU1xVXFSMGROVDJTYlE5Q0ZJSXpjMl9odzJjcDB3"
       }
     ];
 
@@ -543,12 +1034,13 @@
     let myLeafletMap = null;
     let leafletMarkersGroup = null;
     let activeTileLayerKey = 'satellite';
-    let isAutoRotating = true;
+    let isAutoRotating = false;
     let currentSelectedSpot = null;
     let isTransitioningMode = false;
     let activeCursorCoords = { lat: 27.2579, lng: 33.8116 };
     let isFiltersPanelOpen = true;
     let clusterDebounceTimeout = null;
+    let isCountriesMenuOpen = false;
 
     function toggleFiltersPanel() {
       isFiltersPanelOpen = !isFiltersPanelOpen;
@@ -560,7 +1052,7 @@
           panel.style.opacity = '1';
           panel.style.pointerEvents = 'auto';
           panel.style.width = '';
-          panel.style.padding = '0.75rem';
+          panel.style.padding = '0.625rem';
           panel.style.borderWidth = '1px';
           btnOpen.classList.add('hidden');
         } else {
@@ -574,6 +1066,579 @@
         }
       }
     }
+
+    /* Menu déroulant Pays visités */
+    function toggleCountriesMenu(event) {
+      if (event) event.stopPropagation();
+      isCountriesMenuOpen = !isCountriesMenuOpen;
+      const menu = document.getElementById('countries-dropdown');
+      const chevron = document.getElementById('icon-countries-chevron');
+      if (!menu) return;
+
+      if (isCountriesMenuOpen) {
+        renderCountriesDropdown();
+        menu.classList.remove('hidden');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        closeQuickSearchResults();
+        closeAllPopups();
+      } else {
+        menu.classList.add('hidden');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function closeCountriesMenu() {
+      isCountriesMenuOpen = false;
+      const menu = document.getElementById('countries-dropdown');
+      const chevron = document.getElementById('icon-countries-chevron');
+      if (menu) menu.classList.add('hidden');
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+
+    function renderCountriesDropdown() {
+      const container = document.getElementById('countries-list-container');
+      const badge = document.getElementById('dropdown-country-badge');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const countryMap = new Map();
+      travelSpots.forEach(s => {
+        const country = s.country || "Autre";
+        if (!countryMap.has(country)) {
+          countryMap.set(country, {
+            name: country,
+            flag: s.flag || "📍",
+            count: 0,
+            spots: []
+          });
+        }
+        const entry = countryMap.get(country);
+        entry.count++;
+        entry.spots.push(s);
+      });
+
+      const sortedCountries = Array.from(countryMap.values()).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+      if (badge) badge.innerText = `${sortedCountries.length} explorés`;
+
+      sortedCountries.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-1.5 rounded-xl bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-500/20 hover:border-indigo-400/50 cursor-pointer transition select-none group';
+        row.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0 pr-1">
+            <span class="text-base shrink-0 group-hover:scale-110 transition-transform">${c.flag}</span>
+            <span class="text-xs font-semibold text-indigo-100 group-hover:text-white truncate">${c.name}</span>
+          </div>
+          <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-900/70 border border-indigo-500/40 text-indigo-300 shrink-0">
+            ${c.count} ${c.count > 1 ? 'sites' : 'site'}
+          </span>
+        `;
+        row.onclick = (e) => {
+          e.stopPropagation();
+          closeCountriesMenu();
+          flyToCountry(c);
+        };
+        container.appendChild(row);
+      });
+    }
+
+    function flyToCountry(countryData) {
+      if (!countryData || !countryData.spots || countryData.spots.length === 0) return;
+      const spots = countryData.spots;
+      const avgLat = spots.reduce((sum, s) => sum + s.lat, 0) / spots.length;
+      const avgLng = spots.reduce((sum, s) => sum + s.lng, 0) / spots.length;
+
+      if (currentMode === 'globe') {
+        if (myGlobe) myGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 0.9 }, 1200);
+      } else {
+        if (myLeafletMap) myLeafletMap.flyTo([avgLat, avgLng], 6, { duration: 1.2 });
+      }
+    }
+
+    /* Formule de Haversine (distance géodésique sphérique en km) */
+    function getHaversineDistanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return Math.round(R * c);
+    }
+
+    /* GESTION UNIQUE DES 5 POPUPS */
+    function togglePopup(popupId, event) {
+      if (event) event.stopPropagation();
+      const popup = document.getElementById(popupId);
+      if (!popup) return;
+
+      const willOpen = popup.classList.contains('hidden');
+      closeAllPopups();
+      closeCountriesMenu();
+      closeQuickSearchResults();
+
+      if (willOpen) {
+        computeAllStatistics();
+        popup.classList.remove('hidden');
+      }
+    }
+
+    function closeAllPopups() {
+      ['modal-home', 'modal-territories', 'modal-odyssey', 'modal-altitude', 'modal-chrono'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+    }
+
+    function switchTerritoryTab(tab) {
+      const btnWorld = document.getElementById('tab-btn-world');
+      const btnSubdiv = document.getElementById('tab-btn-subdiv');
+      const contentWorld = document.getElementById('tab-content-world');
+      const contentSubdiv = document.getElementById('tab-content-subdiv');
+
+      if (tab === 'world') {
+        btnWorld.className = "flex-1 py-1 rounded-lg text-[10px] font-bold transition bg-blue-600 text-white shadow";
+        btnSubdiv.className = "flex-1 py-1 rounded-lg text-[10px] font-bold transition text-slate-400 hover:text-white";
+        contentWorld.classList.remove('hidden');
+        contentSubdiv.classList.add('hidden');
+      } else {
+        btnSubdiv.className = "flex-1 py-1 rounded-lg text-[10px] font-bold transition bg-blue-600 text-white shadow";
+        btnWorld.className = "flex-1 py-1 rounded-lg text-[10px] font-bold transition text-slate-400 hover:text-white";
+        contentSubdiv.classList.remove('hidden');
+        contentWorld.classList.add('hidden');
+      }
+    }
+
+    /* MOTEUR CENTRALISÉ DES STATISTIQUES (0% CPU au repos - Temps d'exécution : < 1 ms) */
+    function computeAllStatistics() {
+      if (!travelSpots || travelSpots.length === 0) return;
+
+      // 1. POPUP 1 : BASE CASTELLARE-DI-CASINCA & LES 4 CAPS
+      let farthestFromHome = travelSpots[0];
+      let maxDistFromHome = 0;
+      let totalDistFromHome = 0;
+
+      let northSpot = travelSpots[0];
+      let southSpot = travelSpots[0];
+      let westSpot = travelSpots[0];
+      let eastSpot = travelSpots[0];
+
+      // 2. MODES DE TRANSPORT
+      let kmAir = 0;
+      let kmRoad = 0;
+      let kmSea = 0;
+
+      // 3. ALTIMÈTRE & ÎLES
+      let zenithSpot = travelSpots[0];
+      let nadirSpot = travelSpots[0];
+      let islandCount = 0;
+
+      // 4. UNESCO & CIVILISATIONS
+      let unescoCount = 0;
+      let chronoMap = {
+        pharaonique: { label: "Antiquité Pharaonique", span: "-1500 à -1200 av. J.-C.", icon: "🏺", count: 0, color: "#f59e0b" },
+        ptolemaique: { label: "Période Ptolémaïque & Romaine", span: "-300 à +300", icon: "🏛️", count: 0, color: "#38bdf8" },
+        medievale: { label: "Époque Médiévale & Génoise", span: "XVIe - XVIIIe s.", icon: "🏰", count: 0, color: "#818cf8" },
+        contemporain: { label: "XIXe - XXIe s. & Impressionnisme", span: "1883 à nos jours", icon: "🎨", count: 0, color: "#a855f7" },
+        nature: { label: "Temps Géologique & Ère Glaciaire", span: "Temps long", icon: "🌿", count: 0, color: "#10b981" }
+      };
+
+      // 5. PAYS, CONTINENTS & SUBDIVISIONS
+      const visitedCountries = new Set();
+      const continentCount = { "Europe": 0, "Afrique": 0, "Asie": 0, "Amériques": 0, "Océanie": 0 };
+      const subdivData = {};
+
+      travelSpots.forEach(s => {
+        const d = getHaversineDistanceKm(HOME_BASE.lat, HOME_BASE.lng, s.lat, s.lng);
+        totalDistFromHome += d;
+        if (d > maxDistFromHome) {
+          maxDistFromHome = d;
+          farthestFromHome = s;
+        }
+
+        if (s.lat > northSpot.lat) northSpot = s;
+        if (s.lat < southSpot.lat) southSpot = s;
+        if (s.lng < westSpot.lng) westSpot = s;
+        if (s.lng > eastSpot.lng) eastSpot = s;
+
+        // Transport
+        const mode = s.transport || "route";
+        if (mode === "avion") {
+          kmAir += d;
+        } else if (mode === "bateau") {
+          kmSea += Math.round(d * 0.15) + 40; // navigation locale sur le Nil / Mer Rouge
+          kmAir += d; // vol pour y arriver
+        } else {
+          // Route en montagne corse : coefficient de détour
+          const roadDist = s.country === "France" ? Math.round(d * 1.5) : Math.round(d * 1.25);
+          kmRoad += roadDist;
+        }
+
+        // Altitude
+        const alt = typeof s.altitude === 'number' ? s.altitude : 50;
+        if (alt > (typeof zenithSpot.altitude === 'number' ? zenithSpot.altitude : 50)) zenithSpot = s;
+        if (alt < (typeof nadirSpot.altitude === 'number' ? nadirSpot.altitude : 50)) nadirSpot = s;
+
+        // Insulaire
+        if (s.is_island) islandCount++;
+
+        // UNESCO
+        if ((s.counts && s.counts.unesco) || s.category === 'unesco') unescoCount++;
+
+        // Chrono
+        const era = s.era_group || "contemporain";
+        if (chronoMap[era]) chronoMap[era].count++;
+
+        // Territoires
+        visitedCountries.add(s.country);
+        if (s.continent && continentCount[s.continent] !== undefined) {
+          continentCount[s.continent]++;
+        }
+
+        if (!subdivData[s.country]) {
+          subdivData[s.country] = {
+            flag: s.flag || '📍',
+            subdivs: new Set(),
+            regions: new Set(),
+            spots: []
+          };
+        }
+        if (s.subdiv) subdivData[s.country].subdivs.add(s.subdiv);
+        if (s.region_admin) subdivData[s.country].regions.add(s.region_admin);
+        subdivData[s.country].spots.push(s);
+      });
+
+      // --- POPUP 1 : BASE CASINCA ---
+      const homeFarthestDistEl = document.getElementById('stat-home-farthest-dist');
+      const homeFarthestNameEl = document.getElementById('stat-home-farthest-name');
+      if (homeFarthestDistEl) homeFarthestDistEl.innerText = `${maxDistFromHome.toLocaleString('fr-FR')} km`;
+      if (homeFarthestNameEl) {
+        homeFarthestNameEl.innerHTML = `${farthestFromHome.flag || '📍'} <span class="hover:text-amber-300 cursor-pointer underline">${farthestFromHome.name}</span>`;
+        homeFarthestNameEl.onclick = () => { closeAllPopups(); selectSpot(farthestFromHome); };
+      }
+
+      const setCardinal = (elementId, spot, suffix) => {
+        const el = document.getElementById(elementId);
+        if (el) {
+          el.innerText = `${spot.name} (${suffix})`;
+          el.title = `${spot.name} (${spot.country}) - Cliquez pour y aller`;
+          el.onclick = () => { closeAllPopups(); selectSpot(spot); };
+          el.classList.add('cursor-pointer', 'hover:underline');
+        }
+      };
+      setCardinal('stat-cardinal-north', northSpot, `${northSpot.lat.toFixed(1)}°N`);
+      setCardinal('stat-cardinal-south', southSpot, `${southSpot.lat.toFixed(1)}°N`);
+      setCardinal('stat-cardinal-west', westSpot, `${Math.abs(westSpot.lng).toFixed(1)}°${westSpot.lng < 0 ? 'O' : 'E'}`);
+      setCardinal('stat-cardinal-east', eastSpot, `${eastSpot.lng.toFixed(1)}°E`);
+
+      // Envergure maximale
+      let maxDistPair = 0;
+      let bestPair = { a: travelSpots[0], b: travelSpots[0] };
+      for (let i = 0; i < travelSpots.length; i++) {
+        for (let j = i + 1; j < travelSpots.length; j++) {
+          const d = getHaversineDistanceKm(travelSpots[i].lat, travelSpots[i].lng, travelSpots[j].lat, travelSpots[j].lng);
+          if (d > maxDistPair) {
+            maxDistPair = d;
+            bestPair = { a: travelSpots[i], b: travelSpots[j] };
+          }
+        }
+      }
+      const maxDistEl = document.getElementById('stat-max-dist');
+      const maxPairEl = document.getElementById('stat-max-pair');
+      if (maxDistEl) maxDistEl.innerText = `${maxDistPair.toLocaleString('fr-FR')} km`;
+      if (maxPairEl) maxPairEl.innerText = `${bestPair.a.name} ⇄ ${bestPair.b.name}`;
+
+      // --- POPUP 2 : MONDE ONU & SUBDIVISIONS ---
+      const onuCount = visitedCountries.size;
+      const onuPct = ((onuCount / TOTAL_UN_COUNTRIES) * 100).toFixed(2);
+      const onuFractEl = document.getElementById('stat-onu-fraction');
+      const onuPctEl = document.getElementById('stat-onu-pct');
+      const onuBarEl = document.getElementById('stat-onu-bar');
+      if (onuFractEl) onuFractEl.innerText = `${onuCount} / ${TOTAL_UN_COUNTRIES} pays`;
+      if (onuPctEl) onuPctEl.innerText = `${onuPct.replace('.', ',')}%`;
+      if (onuBarEl) onuBarEl.style.width = `${Math.max(1, onuPct)}%`;
+
+      // Continents
+      const contContainer = document.getElementById('stat-continents-container');
+      if (contContainer) {
+        contContainer.innerHTML = '';
+        const continentIcons = { "Europe": "🇪🇺", "Afrique": "🌍", "Asie": "🌏", "Amériques": "🌎", "Océanie": "🌊" };
+        Object.keys(CONTINENT_TOTALS).forEach(cont => {
+          const totalCountries = CONTINENT_TOTALS[cont];
+          // Calcul des pays uniques visités dans ce continent
+          const visitedInCont = new Set(travelSpots.filter(s => s.continent === cont).map(s => s.country)).size;
+          const pct = Math.round((visitedInCont / totalCountries) * 100);
+
+          const row = document.createElement('div');
+          row.className = 'space-y-0.5';
+          row.innerHTML = `
+            <div class="flex justify-between items-center text-[10px]">
+              <span class="text-slate-200 font-medium">${continentIcons[cont] || '🌐'} ${cont}</span>
+              <span class="font-mono text-cyan-300 font-bold">${visitedInCont} / ${totalCountries} <span class="text-slate-500 font-normal text-[9px]">(${pct}%)</span></span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
+              <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-full rounded-full" style="width: ${Math.max(1, pct)}%;"></div>
+            </div>
+          `;
+          contContainer.appendChild(row);
+        });
+      }
+
+      // Subdivisions Territoriales
+      const subdivList = document.getElementById('stat-subdivisions-list');
+      if (subdivList) {
+        subdivList.innerHTML = '';
+        Object.keys(subdivData).forEach(countryName => {
+          const data = subdivData[countryName];
+          const ref = COUNTRY_SUBDIV_TOTALS[countryName] || { type: "Subdivisions", total: 20 };
+          const subdivCount = data.subdivs.size;
+          const subdivPct = Math.round((subdivCount / ref.total) * 100);
+
+          const card = document.createElement('div');
+          card.className = 'p-2 rounded-xl bg-slate-950/70 border border-slate-800 space-y-1.5';
+          
+          let regionsHtml = '';
+          if (ref.regionTotal && data.regions.size > 0) {
+            const regPct = Math.round((data.regions.size / ref.regionTotal) * 100);
+            regionsHtml = `
+              <div class="flex justify-between items-center text-[9px] text-slate-400 mt-1">
+                <span>Régions : ${Array.from(data.regions).join(', ')}</span>
+                <span class="font-mono font-bold text-slate-300">${data.regions.size} / ${ref.regionTotal} (${regPct}%)</span>
+              </div>
+            `;
+          }
+
+          card.innerHTML = `
+            <div class="flex justify-between items-center text-[11px] font-bold">
+              <span class="text-white flex items-center gap-1.5">${data.flag} ${countryName}</span>
+              <span class="font-mono text-cyan-300">${subdivCount} / ${ref.total} ${ref.type.toLowerCase()}</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div class="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full" style="width: ${Math.max(2, subdivPct)}%;"></div>
+            </div>
+            <div class="text-[9px] text-slate-400">
+              <span class="text-slate-300 font-medium">Explorés :</span> ${Array.from(data.subdivs).join(', ')}
+            </div>
+            ${regionsHtml}
+          `;
+          subdivList.appendChild(card);
+        });
+      }
+
+      // --- POPUP 3 : KILOMÉTRAGE DIFFÉRENCIÉ ---
+      const totalKm = kmAir + kmRoad + kmSea;
+      const totalKmEl = document.getElementById('stat-odyssey-total-km');
+      if (totalKmEl) totalKmEl.innerText = `${totalKm.toLocaleString('fr-FR')} km`;
+
+      const airKmEl = document.getElementById('stat-km-air');
+      const roadKmEl = document.getElementById('stat-km-road');
+      const seaKmEl = document.getElementById('stat-km-sea');
+      if (airKmEl) airKmEl.innerText = `${kmAir.toLocaleString('fr-FR')} km`;
+      if (roadKmEl) roadKmEl.innerText = `${kmRoad.toLocaleString('fr-FR')} km`;
+      if (seaKmEl) seaKmEl.innerText = `${kmSea.toLocaleString('fr-FR')} km`;
+
+      const barAir = document.getElementById('stat-bar-air');
+      const barRoad = document.getElementById('stat-bar-road');
+      const barSea = document.getElementById('stat-bar-sea');
+      if (barAir) barAir.style.width = `${Math.round((kmAir / (totalKm || 1)) * 100)}%`;
+      if (barRoad) barRoad.style.width = `${Math.round((kmRoad / (totalKm || 1)) * 100)}%`;
+      if (barSea) barSea.style.width = `${Math.round((kmSea / (totalKm || 1)) * 100)}%`;
+
+      // --- POPUP 4 : ALTIMÈTRE & ÎLES ---
+      const zenithAlt = typeof zenithSpot.altitude === 'number' ? zenithSpot.altitude : 1743;
+      const nadirAlt = typeof nadirSpot.altitude === 'number' ? nadirSpot.altitude : -5;
+      const amplitude = zenithAlt - nadirAlt;
+
+      const altMaxVal = document.getElementById('stat-alt-max-val');
+      const altMaxName = document.getElementById('stat-alt-max-name');
+      const altMinVal = document.getElementById('stat-alt-min-val');
+      const altMinName = document.getElementById('stat-alt-min-name');
+      const altAmp = document.getElementById('stat-alt-amplitude');
+
+      if (altMaxVal) altMaxVal.innerText = `${zenithAlt > 0 ? '+' : ''}${zenithAlt} m`;
+      if (altMaxName) altMaxName.innerText = zenithSpot.name;
+      if (altMinVal) altMinVal.innerText = `${nadirAlt > 0 ? '+' : ''}${nadirAlt} m`;
+      if (altMinName) altMinName.innerText = nadirSpot.name;
+      if (altAmp) altAmp.innerText = `${amplitude} m de dénivelé`;
+
+      // Îles vs Continent
+      const islandPct = Math.round((islandCount / travelSpots.length) * 100);
+      const mainlandPct = 100 - islandPct;
+      const islPctEl = document.getElementById('stat-islands-pct');
+      const mainPctEl = document.getElementById('stat-mainland-pct');
+      const barIsl = document.getElementById('stat-bar-islands');
+      const barMain = document.getElementById('stat-bar-mainland');
+      const noteIsl = document.getElementById('stat-islands-note');
+
+      if (islPctEl) islPctEl.innerText = `${islandPct}%`;
+      if (mainPctEl) mainPctEl.innerText = `${mainlandPct}%`;
+      if (barIsl) barIsl.style.width = `${islandPct}%`;
+      if (barMain) barMain.style.width = `${mainlandPct}%`;
+      if (noteIsl) noteIsl.innerText = `« Vous passez ${islandPct}% de vos explorations les pieds entourés d'eau (Corse & îles du Nil) ! »`;
+
+      // --- POPUP 5 : CHRONO-SCOPE & UNESCO ---
+      const unescoCountVal = document.getElementById('stat-unesco-count-val');
+      const unescoPctVal = document.getElementById('stat-unesco-pct-val');
+      if (unescoCountVal) unescoCountVal.innerText = unescoCount;
+      if (unescoPctVal) unescoPctVal.innerText = `${Math.round((unescoCount / travelSpots.length) * 100)}%`;
+
+      const chronoContainer = document.getElementById('stat-chrono-breakdown');
+      if (chronoContainer) {
+        chronoContainer.innerHTML = '';
+        Object.keys(chronoMap).forEach(k => {
+          const item = chronoMap[k];
+          const pct = Math.round((item.count / travelSpots.length) * 100);
+
+          const row = document.createElement('div');
+          row.className = 'p-1.5 rounded-lg bg-slate-950/70 border border-slate-800/80 space-y-1';
+          row.innerHTML = `
+            <div class="flex justify-between items-center text-[10px]">
+              <span class="font-medium text-slate-200">${item.icon} ${item.label}</span>
+              <span class="font-mono text-indigo-300 font-bold">${item.count} <span class="text-slate-500 font-normal">(${pct}%)</span></span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-300" style="background-color: ${item.color}; width: ${Math.max(2, pct)}%;"></div>
+            </div>
+            <div class="text-[8px] text-slate-400 italic">${item.span}</div>
+          `;
+          chronoContainer.appendChild(row);
+        });
+      }
+    }
+
+    /* Navigation Précédent / Suivant (◀ / ▶) */
+    function navigateSpot(direction) {
+      if (!travelSpots || travelSpots.length === 0) return;
+      const currentIndex = currentSelectedSpot ? travelSpots.findIndex(s => s.id === currentSelectedSpot.id) : 0;
+      let nextIndex = currentIndex + direction;
+      if (nextIndex < 0) nextIndex = travelSpots.length - 1;
+      if (nextIndex >= travelSpots.length) nextIndex = 0;
+      selectSpot(travelSpots[nextIndex]);
+    }
+
+    /* Copie GPS instantanée */
+    function copyCurrentGPS() {
+      if (!currentSelectedSpot) return;
+      const text = `${currentSelectedSpot.lat.toFixed(4)}, ${currentSelectedSpot.lng.toFixed(4)}`;
+      navigator.clipboard.writeText(text).then(() => {
+        const feedback = document.getElementById('copy-gps-feedback');
+        if (feedback) {
+          feedback.innerText = "Copié !";
+          setTimeout(() => { feedback.innerText = "GPS"; }, 1500);
+        }
+      });
+    }
+
+    /* Recherche rapide en temps réel */
+    function handleQuickSearch(query) {
+      const q = (query || "").trim().toLowerCase();
+      const resultsContainer = document.getElementById('quick-search-results');
+      const clearBtn = document.getElementById('quick-search-clear');
+      if (!resultsContainer) return;
+
+      if (clearBtn) {
+        if (q.length > 0) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+
+      if (q.length === 0) {
+        resultsContainer.innerHTML = '';
+        resultsContainer.classList.add('hidden');
+        return;
+      }
+
+      const matches = travelSpots.filter(s => {
+        return s.name.toLowerCase().includes(q) ||
+               (s.region && s.region.toLowerCase().includes(q)) ||
+               s.country.toLowerCase().includes(q) ||
+               (s.description && s.description.toLowerCase().includes(q));
+      }).slice(0, 7);
+
+      resultsContainer.innerHTML = '';
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="p-3 text-center text-xs text-slate-400">
+            Aucun lieu trouvé pour « <span class="text-white">${query}</span> »
+          </div>
+        `;
+      } else {
+        matches.forEach(spot => {
+          const item = document.createElement('div');
+          item.className = 'flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-800/90 cursor-pointer transition border border-transparent hover:border-cyan-500/30';
+          item.innerHTML = `
+            <span class="text-sm shrink-0">${spot.flag || '📍'}</span>
+            <div class="min-w-0 flex-1">
+              <div class="text-xs font-semibold text-white truncate">${spot.name}</div>
+              <div class="text-[9px] text-cyan-400 truncate">${spot.country} · ${spot.region || ''}</div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-[10px] text-slate-500 mr-1"></i>
+          `;
+          item.onclick = () => {
+            selectSpot(spot);
+            closeQuickSearchResults();
+          };
+          resultsContainer.appendChild(item);
+        });
+      }
+      resultsContainer.classList.remove('hidden');
+      closeCountriesMenu();
+      closeAllPopups();
+    }
+
+    function clearQuickSearch() {
+      const input = document.getElementById('quick-search-input');
+      if (input) input.value = '';
+      handleQuickSearch('');
+    }
+
+    function closeQuickSearchResults() {
+      const resultsContainer = document.getElementById('quick-search-results');
+      if (resultsContainer) resultsContainer.classList.add('hidden');
+    }
+
+    function pickRandomDestination() {
+      if (!travelSpots || travelSpots.length === 0) return;
+      const randomIndex = Math.floor(Math.random() * travelSpots.length);
+      selectSpot(travelSpots[randomIndex]);
+    }
+
+    function toggleFullScreen() {
+      const icon = document.getElementById('fullscreen-icon');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          if (icon) icon.className = "fa-solid fa-compress text-xs";
+        }).catch(err => console.warn(err));
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().then(() => {
+            if (icon) icon.className = "fa-solid fa-expand text-xs";
+          }).catch(err => console.warn(err));
+        }
+      }
+    }
+
+    // Fermeture automatique au clic à l'extérieur
+    document.addEventListener('click', (e) => {
+      const countryMenu = document.getElementById('countries-dropdown');
+      const countryBtn = document.getElementById('btn-dropdown-countries');
+      if (countryMenu && !countryMenu.contains(e.target) && !countryBtn.contains(e.target)) {
+        closeCountriesMenu();
+      }
+
+      ['modal-home', 'modal-territories', 'modal-odyssey', 'modal-altitude', 'modal-chrono'].forEach(id => {
+        const modal = document.getElementById(id);
+        const trigger = document.getElementById('btn-popup-' + id.replace('modal-', ''));
+        if (modal && !modal.contains(e.target) && trigger && !trigger.contains(e.target)) {
+          modal.classList.add('hidden');
+        }
+      });
+
+      const searchInput = document.getElementById('quick-search-input');
+      const searchResults = document.getElementById('quick-search-results');
+      if (searchResults && !searchResults.contains(e.target) && searchInput !== e.target) {
+        closeQuickSearchResults();
+      }
+    });
 
     function normalizeLongitude(lng) {
       return ((((lng + 180) % 360) + 360) % 360) - 180;
@@ -646,7 +1711,6 @@
                   <span class="text-cyan-400 text-[10px]">📍</span>
                   <span class="font-mono text-xs font-black tracking-tight text-white">${count}</span>
                 </div>
-                <!-- Étiquette flottante cluster -->
                 <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none whitespace-nowrap px-2 py-0.5 rounded-lg bg-slate-950/95 border border-cyan-400/50 text-[10px] font-bold text-cyan-300 shadow-xl z-50">
                   ${count} sites regroupés
                 </div>
@@ -668,7 +1732,6 @@
               <div class="relative w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] border-2 border-white/90 shadow-lg cursor-pointer hover:scale-120 transition-transform duration-150" style="background-color: ${cat.color};">
                 <i class="fa-solid ${cat.icon}"></i>
               </div>
-              <!-- Étiquette flottante au survol d'un point 3D -->
               <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none whitespace-nowrap px-2 py-1 rounded-lg bg-slate-950/95 border border-cyan-400/60 text-[10px] font-bold text-white shadow-2xl flex items-center gap-1.5 z-50">
                 <span>${spot.flag || '📍'}</span>
                 <span>${spot.name}</span>
@@ -684,7 +1747,6 @@
 
       myGlobe.pointOfView({ lat: 27.2579, lng: 33.8116, altitude: 2.1 }, 0);
 
-      // Bride la résolution de rendu WebGL à 1 pour soulager drastiquement le processeur graphique
       try {
         if (typeof myGlobe.renderer === 'function') {
           myGlobe.renderer().setPixelRatio(1);
@@ -702,7 +1764,6 @@
       controls.maxDistance = 1200;
       controls.enabled = true;
 
-      // Arrêt automatique du calcul au repos : évite de faire tourner le processeur quand on ne manipule rien
       controls.addEventListener('start', () => {
         if (isAutoRotating) {
           controls.autoRotate = false;
@@ -795,7 +1856,6 @@
         });
         const marker = L.marker([spot.lat, spot.lng], { icon: customIcon });
 
-        // Étiquette flottante au survol d'un point sur la carte HD
         marker.bindTooltip(`<span>${spot.flag || '📍'}</span> <span class="font-bold">${spot.name}</span>`, {
           direction: 'top',
           offset: [0, -12],
@@ -823,7 +1883,6 @@
         let lng = targetCoords ? normalizeLongitude(targetCoords.lng) : (activeCursorCoords ? activeCursorCoords.lng : 33.8116);
         let zoom = targetZoom || 9;
 
-        // Désactivation totale des interactions du Globe au profit de Leaflet
         globeView.style.opacity = '0';
         globeView.style.pointerEvents = 'none';
         mapView.style.opacity = '1';
@@ -850,7 +1909,6 @@
         let lng = targetCoords ? normalizeLongitude(targetCoords.lng) : 33.8116;
         let altitude = targetCoords && targetCoords.altitude ? targetCoords.altitude : 2.1;
 
-        // Neutralisation complète de Leaflet pour ne jamais bloquer le Globe en vue dézoomée
         mapView.style.opacity = '0';
         mapView.style.pointerEvents = 'none';
         globeView.style.opacity = '1';
@@ -868,9 +1926,7 @@
 
         if (myGlobe) {
           const controls = myGlobe.controls();
-          if (controls) {
-            controls.enabled = true;
-          }
+          if (controls) controls.enabled = true;
           setTimeout(onWindowResize, 100);
           myGlobe.pointOfView({ lat: lat, lng: lng, altitude: altitude }, 800);
         }
@@ -895,6 +1951,13 @@
       const desc = document.getElementById('card-description');
       const visiter = document.getElementById('card-visiter');
       const link = document.getElementById('card-link');
+      const gmapsLink = document.getElementById('card-gmaps-link');
+      const indexEl = document.getElementById('card-spot-index');
+
+      const spotIdx = travelSpots.findIndex(s => s.id === spot.id);
+      if (indexEl && spotIdx !== -1) {
+        indexEl.innerText = `${spotIdx + 1} / ${travelSpots.length}`;
+      }
 
       flagEl.innerText = spot.flag || '📍';
       regionEl.innerText = `${spot.country} · ${spot.region || 'Région non spécifiée'}`;
@@ -915,17 +1978,21 @@
         const cat = CATEGORIES[catKey];
         if (!cat) return;
         const tag = document.createElement('div');
-        tag.className = 'px-2.5 py-1 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider shadow flex items-center gap-1.5 border border-white/20';
+        tag.className = 'px-2 py-0.5 rounded-lg text-[9px] font-bold text-white uppercase tracking-wider shadow flex items-center gap-1 border border-white/20';
         tag.style.backgroundColor = cat.color;
         tag.innerHTML = `<i class="fa-solid ${cat.icon}"></i><span>${cat.label}</span>`;
         tagsContainer.appendChild(tag);
       });
 
       title.innerText = spot.name;
-      location.querySelector('span').innerText = `${spot.lat.toFixed(4)}°N, ${spot.lng.toFixed(4)}°E`;
+      location.querySelector('span').innerText = `${spot.lat.toFixed(4)}°N, ${spot.lng.toFixed(4)}°E (${spot.altitude > 0 ? '+' : ''}${spot.altitude} m)`;
       desc.innerText = spot.description;
       visiter.innerText = spot.visiter || "Aucun détail complémentaire renseigné pour ce site.";
       link.href = spot.link;
+
+      if (gmapsLink) {
+        gmapsLink.href = `https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}`;
+      }
 
       updateSpotToggleButton();
       card.classList.remove('hidden');
@@ -968,14 +2035,6 @@
       }
     }
 
-    function flyToSpotCoordinates(lat, lng, zoom2D = 12) {
-      if (currentMode === 'map') {
-        if (myLeafletMap) myLeafletMap.flyTo([lat, lng], zoom2D, { duration: 1.2 });
-      } else {
-        if (myGlobe) myGlobe.pointOfView({ lat: lat, lng: lng, altitude: 0.35 }, 1200);
-      }
-    }
-
     function resetGlobalView() {
       closeSpotCard();
       setViewingMode('globe', { lat: 27.2579, lng: 33.8116, altitude: 2.1 });
@@ -985,9 +2044,7 @@
       let matched = false;
       if (spot.counts) {
         Object.keys(spot.counts).forEach(catKey => {
-          if (CATEGORIES[catKey] && CATEGORIES[catKey].active) {
-            matched = true;
-          }
+          if (CATEGORIES[catKey] && CATEGORIES[catKey].active) matched = true;
         });
       }
       if (!matched && spot.category && CATEGORIES[spot.category] && CATEGORIES[spot.category].active) {
@@ -999,9 +2056,7 @@
     function getFirstActiveCategoryForSpot(spot) {
       if (spot.counts) {
         for (let catKey of Object.keys(spot.counts)) {
-          if (CATEGORIES[catKey] && CATEGORIES[catKey].active) {
-            return catKey;
-          }
+          if (CATEGORIES[catKey] && CATEGORIES[catKey].active) return catKey;
         }
       }
       if (spot.category && CATEGORIES[spot.category] && CATEGORIES[spot.category].active) {
@@ -1021,28 +2076,23 @@
       const pov = myGlobe.pointOfView();
       const altitude = (pov && typeof pov.altitude === 'number' && !isNaN(pov.altitude)) ? pov.altitude : 2.0;
 
-      // CULLING DE L'HÉMISPHÈRE CACHÉ : On exclut immédiatement les points situés derrière la planète
-      // Cela évite au navigateur de calculer et positionner des éléments HTML invisibles
+      // Culling de l'hémisphère caché (0 charge GPU au verso)
       const visibleSpots = filteredSpots.filter(spot => {
-        // Distance angulaire par rapport au centre de vue de la caméra
         const dLat = (spot.lat - (pov.lat || 0)) * Math.PI / 180;
         const dLng = (spot.lng - (pov.lng || 0)) * Math.PI / 180;
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                   Math.cos((pov.lat || 0) * Math.PI / 180) * Math.cos(spot.lat * Math.PI / 180) *
                   Math.sin(dLng / 2) * Math.sin(dLng / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        // L'hémisphère visible représente un angle d'environ 85 à 90 degrés selon l'altitude
         return c < (Math.PI / 2 + 0.1);
       });
 
-      // En vue rapprochée (< 0.45 d'altitude), affichage unitaire des points visibles
       if (altitude <= 0.45) {
         myGlobe.htmlElementsData(visibleSpots.map(spot => ({ spot, lat: spot.lat, lng: spot.lng })));
         updateStats();
         return;
       }
 
-      // En vue éloignée : regroupement dynamique selon la distance
       const clusterThresholdDeg = altitude >= 1.6 ? 26 : Math.max(1.8, (altitude - 0.3) * 11);
       const clusters = [];
 
@@ -1141,7 +2191,6 @@
             </div>
             <span class="text-slate-200 text-[10px] font-medium truncate">${cat.label}</span>
           </div>
-          <!-- Badge réservé aux nombres jusqu'à 3 chiffres (min-w 26px aligné et centré) -->
           <span class="min-w-[26px] text-center font-mono font-bold text-[9px] px-1 py-0.5 rounded bg-slate-950/70 border border-slate-800 shrink-0 ${count > 0 ? 'text-cyan-300' : 'text-slate-500'}">${count}</span>
         `;
         container.appendChild(row);
