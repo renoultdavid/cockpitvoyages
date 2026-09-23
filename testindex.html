@@ -2208,6 +2208,7 @@ const CATEGORIES = {
 
     // Référentiel chronologique rigoureux : Antiquité puis Ve au XXIe siècle
     const CHRONOLOGICAL_CENTURIES = [
+      "Préhistoire",
       "Antiquité",
       "Ve siècle",
       "VIe siècle",
@@ -2541,6 +2542,14 @@ function spotMatchesFilter(spot) {
       if (!selectedCentury || selectedCentury === 'all') return true;
       const spotCent = (spot.century || "").toLowerCase();
       const selCent = selectedCentury.toLowerCase();
+
+      if (selCent === 'préhistoire') {
+        return spotCent.includes('préhistoire') || 
+               spotCent.includes('néolithique') || 
+               spotCent.includes('paléolithique') || 
+               spot.era_group === 'prehistoire' || 
+               spot.category === 'megalithe';
+      }
 
       if (selCent === 'antiquité') {
         return spotCent.includes('antiquité') || spot.era_group === 'pharaonique' || spot.era_group === 'ptolemaique';
