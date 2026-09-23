@@ -3665,20 +3665,26 @@ function spotMatchesFilter(spot) {
           }
           const sectionHeader = document.createElement('div');
           sectionHeader.className = 'text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 px-1.5 py-0.5 rounded';
-          if (lastSection === 'culture') {
-            sectionHeader.className += ' text-amber-500 bg-amber-950/50 border border-amber-600/30';
-            sectionHeader.innerHTML = '<i class="fa-solid fa-landmark text-[8px]"></i> Culture';
+         if (key === 'tous') {
+            lastSection = null; // Empêche l'affichage du titre Culture au-dessus de "Tous les POI"
           } else {
-            sectionHeader.className += ' text-cyan-400 bg-cyan-950/50 border border-cyan-600/30';
-            sectionHeader.innerHTML = '<i class="fa-solid fa-water text-[8px]"></i> Nature';
+            if (lastSection === 'culture') {
+              sectionHeader.className += ' text-amber-500 bg-amber-950/50 border border-amber-600/30';
+              sectionHeader.innerHTML = '<i class="fa-solid fa-landmark text-[8px]"></i> Culture';
+            } else {
+              sectionHeader.className += ' text-cyan-400 bg-cyan-950/50 border border-cyan-600/30';
+              sectionHeader.innerHTML = '<i class="fa-solid fa-water text-[8px]"></i> Nature';
+            }
+            container.appendChild(sectionHeader);
           }
-          container.appendChild(sectionHeader);
         }
 
         let count = 0;
         let tooltipText = '';
 
-        if (key === 'ile') {
+        if (key === 'tous') {
+          count = travelSpots.length; // Compte la totalité exacte de tous vos POI
+        } else if (key === 'ile') {
           const uniqueIslands = new Set();
           travelSpots.forEach(s => {
             if (s.is_island) {
