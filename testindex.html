@@ -12,10 +12,10 @@
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Leaflet MarkerCluster -->
+  <!-- Leaflet MarkerCluster (CDN fiabilisé cdnjs) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/1.5.3/leaflet.markercluster.Default.css" />
-  <script src="https://unpkg.com/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
   <!-- Globe.GL 3D Visualization -->
   <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js"></script>
 
@@ -3369,11 +3369,19 @@ function spotMatchesFilter(spot) {
         marker.on('click', () => selectSpot(spot));
         markersToAdd.push(marker);
       });
-      leafletMarkersGroup.addLayers(markersToAdd);
+
+      // Injection sécurisée sans risque de blocage
+      if (typeof leafletMarkersGroup.addLayers === 'function') {
+        leafletMarkersGroup.addLayers(markersToAdd);
+      } else {
+        markersToAdd.forEach(m => leafletMarkersGroup.addLayer(m));
+      }
     }
 
     function setViewingMode(mode, targetCoords = null, targetZoom = null) {
       currentMode = mode;
+      isTransitioningMode = false; // Réinitialise systématiquement le verrou
+
       const globeView = document.getElementById('globe-view');
       const mapView = document.getElementById('map-view');
       const btnGlobe = document.getElementById('btn-mode-globe');
@@ -3794,7 +3802,7 @@ function spotMatchesFilter(spot) {
 
     function zoomMapOut() {
       if (currentMode === 'map' && myLeafletMap) {
-        if (myLeafletMap.getZoom() <= 4) {
+        if (myLeafletMap.getZoom() <= 5) {
           const center = myLeafletMap.getCenter();
           setViewingMode('globe', { lat: center.lat, lng: center.lng, altitude: 2.1 });
         } else {
