@@ -2409,7 +2409,9 @@
       const isNegative = spotCent.includes('av. j.-c.');
       if (isNegative) return false;
 
-      return spotCent.includes(cleanSel);
+      // Expression régulière stricte : isole le terme pour que "vi" ne matche pas dans "xvi"
+      const regex = new RegExp(`(^|[^a-z0-9])${cleanSel}([^a-z0-9]|$)`, 'i');
+      return regex.test(spotCent);
     }
 
     function initAdvancedFilterOptions() {
