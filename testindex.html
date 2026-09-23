@@ -2182,7 +2182,7 @@
 
     // Dictionnaire officiel des filtres : Culture et Nature (avec l'item Île)
 const CATEGORIES = {
-  tous: { label: "Tous les POI", icon: "fa-layer-group", color: "#06b6d4", section: "culture", active: true },
+  tous: { label: "Tous les POI", icon: "fa-star", color: "#f59e0b", section: "culture", active: true },
   ville: { label: "Ville / Village", icon: "fa-city", color: "#b45309", section: "culture", active: true },
   musee: { label: "Musée", icon: "fa-landmark", color: "#a16207", section: "culture", active: true },
   religieux: { label: "Édifice religieux", icon: "fa-church", color: "#854d0e", section: "culture", active: true },
@@ -3460,8 +3460,12 @@ function spotMatchesFilter(spot) {
           if (CATEGORIES[k]) spotCategories.push(k);
         });
       }
-      if (spotCategories.length === 0 && spot.category) {
-        spotCategories.push(spot.category);
+      if (spotCategories.length === 0) {
+        if (spot.category) {
+          spotCategories.push(spot.category);
+        } else {
+          spotCategories.push('tous');
+        }
       }
       if (spot.is_island && !spotCategories.includes('ile')) {
         spotCategories.push('ile');
@@ -3532,35 +3536,41 @@ function spotMatchesFilter(spot) {
     }
 
     function spotMatchesActiveFilters(spot) {
-      let matched = false;
-      if (spot.counts) {
-        Object.keys(spot.counts).forEach(catKey => {
-          if (CATEGORIES[catKey] && CATEGORIES[catKey].active) matched = true;
-        });
-      }
-      if (!matched && spot.category && CATEGORIES[spot.category] && CATEGORIES[spot.category].active) {
-        matched = true;
-      }
-      if (!matched && CATEGORIES.ile && CATEGORIES.ile.active && spot.is_island) {
-        matched = true;
-      }
-      return matched;
-    }
+  // Règle absolue : si "Tous les POI" est coché, tout s'affiche sans exception
+  if (CATEGORIES.tous && CATEGORIES.tous.active) {
+    return true;
+  }
+
+  let matched = false;
+  if (spot.counts) {
+    Object.keys(spot.counts).forEach(catKey => {
+      if (CATEGORIES[catKey] && CATEGORIES[catKey].active) matched = true;
+    });
+  }
+  if (!matched && spot.category && CATEGORIES[spot.category] && CATEGORIES[spot.category].active) {
+    matched = true;
+  }
+  if (!matched && CATEGORIES.ile && CATEGORIES.ile.active && spot.is_island) {
+    matched = true;
+  }
+  return matched;
+}
 
     function getFirstActiveCategoryForSpot(spot) {
-      if (spot.counts) {
-        for (let catKey of Object.keys(spot.counts)) {
-          if (CATEGORIES[catKey] && CATEGORIES[catKey].active) return catKey;
-        }
-      }
-      if (spot.category && CATEGORIES[spot.category] && CATEGORIES[spot.category].active) {
-        return spot.category;
-      }
-      if (CATEGORIES.ile && CATEGORIES.ile.active && spot.is_island) {
-        return 'ile';
-      }
-      return spot.category;
+  if (spot.counts) {
+    for (let catKey of Object.keys(spot.counts)) {
+      if (CATEGORIES[catKey] && CATEGORIES[catKey].active && catKey !== 'tous') return catKey;
     }
+  }
+  if (spot.category && CATEGORIES[spot.category] && CATEGORIES[spot.category].active) {
+    return spot.category;
+  }
+  if (CATEGORIES.ile && CATEGORIES.ile.active && spot.is_island) {
+    return 'ile';
+  }
+  // S'il n'a aucune catégorie spécifique ou que seul "tous" est actif :
+  return 'tous';
+}
 
     function getFilteredSpots() {
       return travelSpots.filter(spot => spotMatchesActiveFilters(spot));
