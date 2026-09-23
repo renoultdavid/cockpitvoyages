@@ -3127,7 +3127,12 @@
           spiderfyOnMaxZoom: true,
           showCoverageOnHover: false,
           zoomToBoundsOnClick: false,
-          maxClusterRadius: 60,
+          // Rayon dynamique : grand quand on dézoome (regroupement fort), petit quand on zoome (éclatement progressif)
+          maxClusterRadius: function (zoom) {
+            if (zoom <= 5) return 120;
+            if (zoom <= 9) return 80;
+            return 40;
+          },
           animateAddingMarkers: true,
           removeOutsideVisibleBounds: true,
           iconCreateFunction: function(cluster) {
