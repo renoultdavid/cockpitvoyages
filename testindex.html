@@ -3277,10 +3277,11 @@ function spotMatchesFilter(spot) {
           spiderfyOnMaxZoom: true,
           showCoverageOnHover: false,
           zoomToBoundsOnClick: true,
-          maxClusterRadius: 50,
-          disableClusteringAtZoom: 16,
+          maxClusterRadius: 80,
+          disableClusteringAtZoom: 18,
           animate: true,
-          animateAddingMarkers: true,
+          animateAddingMarkers: false,
+          chunkedLoading: true,
           iconCreateFunction: function(cluster) {
             return L.divIcon({
               html: `<span>${cluster.getChildCount()}</span>`,
@@ -3317,6 +3318,7 @@ function spotMatchesFilter(spot) {
     function updateLeafletDisplay() {
       if (!myLeafletMap || !leafletMarkersGroup) return;
       leafletMarkersGroup.clearLayers();
+      const markersToAdd = [];
 
       if (isOnlyIslandFilterActive()) {
         const islandClusters = getIslandClustersData();
@@ -3365,8 +3367,9 @@ function spotMatchesFilter(spot) {
         });
 
         marker.on('click', () => selectSpot(spot));
-        leafletMarkersGroup.addLayer(marker);
+        markersToAdd.push(marker);
       });
+      leafletMarkersGroup.addLayers(markersToAdd);
     }
 
     function setViewingMode(mode, targetCoords = null, targetZoom = null) {
@@ -3403,8 +3406,11 @@ function spotMatchesFilter(spot) {
         if (!myLeafletMap) {
           initLeafletMap([lat, lng], zoom);
         } else {
-          myLeafletMap.invalidateSize();
           myLeafletMap.setView([lat, lng], zoom, { animate: false });
+          setTimeout(() => {
+            myLeafletMap.invalidateSize();
+            updateLeafletDisplay();
+          }, 60);
         }
       } else {
         let lat = targetCoords ? targetCoords.lat : 27.2579;
