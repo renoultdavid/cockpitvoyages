@@ -3169,7 +3169,9 @@
 
     function updateLeafletDisplay() {
       if (!myLeafletMap || !leafletMarkersGroup) return;
+      
       leafletMarkersGroup.clearLayers();
+      const markersArray = [];
 
       if (isOnlyIslandFilterActive()) {
         const islandClusters = getIslandClustersData();
@@ -3194,10 +3196,35 @@
             className: 'custom-leaflet-tooltip'
           });
           marker.on('click', () => openIslandSummaryCard(cluster));
-          leafletMarkersGroup.addLayer(marker);
+          markersArray.push(marker);
         });
-        return;
+      } else {
+        getFilteredSpots().forEach(spot => {
+          const activeCatKey = getFirstActiveCategoryForSpot(spot);
+          const cat = CATEGORIES[activeCatKey] || CATEGORIES[spot.category] || { color: '#06b6d4', icon: 'fa-location-dot' };
+          
+          const customIcon = L.divIcon({
+            className: 'custom-pin',
+            html: `<div style="background-color: ${cat.color}; box-shadow: 0 0 8px ${cat.color};" class="w-6 h-6 rounded-full flex items-center justify-center text-white border-2 border-white shadow-lg cursor-pointer transform hover:scale-125 transition"><i class="fa-solid ${cat.icon} text-[10px]"></i></div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+          });
+          const marker = L.marker([spot.lat, spot.lng], { icon: customIcon });
+
+          marker.bindTooltip(`<span>${spot.flag || '📍'}</span> <span class="font-bold">${spot.name}</span>`, {
+            direction: 'top',
+            offset: [0, -12],
+            className: 'custom-leaflet-tooltip'
+          });
+
+          marker.on('click', () => selectSpot(spot));
+          markersArray.push(marker);
+        });
       }
+
+      // Injection en lot pour permettre à MarkerCluster de gérer l'éclatement fluide
+      leafletMarkersGroup.addLayers(markersArray);
+    }
 
       getFilteredSpots().forEach(spot => {
         const activeCatKey = getFirstActiveCategoryForSpot(spot);
