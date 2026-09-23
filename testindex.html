@@ -3126,8 +3126,10 @@
         leafletMarkersGroup = L.markerClusterGroup({
           spiderfyOnMaxZoom: true,
           showCoverageOnHover: false,
-          zoomToBoundsOnClick: false, // Désactivé pour empêcher le dézoom global
-          maxClusterRadius: 40,
+          zoomToBoundsOnClick: false,
+          maxClusterRadius: 60,
+          animateAddingMarkers: true,
+          removeOutsideVisibleBounds: true,
           iconCreateFunction: function(cluster) {
             return L.divIcon({
               html: `<span>${cluster.getChildCount()}</span>`,
@@ -3137,7 +3139,6 @@
           }
         });
 
-        // Gestion propre du clic sur cluster : zoome localement sans brusquerie
         leafletMarkersGroup.on('clusterclick', function (a) {
           const currentZoom = myLeafletMap.getZoom();
           const targetZoom = Math.min(myLeafletMap.getMaxZoom(), currentZoom + 2);
