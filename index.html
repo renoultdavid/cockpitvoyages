@@ -42,7 +42,6 @@
       box-shadow: 0 12px 35px -5px rgba(0, 0, 0, 0.7);
     }
 
-    /* Thème Bleu Nuit / Saphir pour les Pays Visités & Stats */
     .glass-panel-indigo {
       background: rgba(10, 16, 38, 0.96);
       backdrop-filter: blur(18px);
@@ -150,7 +149,7 @@
       </div>
     </div>
 
-    <!-- Centre : Compteurs hauts (Sites & Menu Pays visités en Bleu Saphir / Indigo) -->
+    <!-- Centre : Compteurs hauts -->
     <div class="relative flex items-center gap-2 pointer-events-auto">
       <!-- Sites visités -->
       <div class="glass-panel px-3 py-1.5 rounded-2xl flex items-center gap-2 border border-cyan-500/30">
@@ -163,7 +162,7 @@
         </div>
       </div>
 
-      <!-- Pays visités (Bleu nuit / Indigo saphir profond) -->
+      <!-- Pays visités (Bleu nuit / Indigo) -->
       <button id="btn-dropdown-countries" onclick="toggleCountriesMenu(event)" class="glass-panel px-3 py-1.5 rounded-2xl flex items-center gap-2 border border-indigo-500/50 hover:border-indigo-400 hover:bg-slate-900/90 transition shadow-lg group cursor-pointer" title="Afficher la liste des pays visités">
         <div class="w-6 h-6 rounded-lg bg-indigo-500/25 text-indigo-300 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
           <i class="fa-solid fa-earth-americas"></i>
@@ -189,9 +188,9 @@
       </div>
     </div>
 
-    <!-- Côté droit : Recherche instantanée, 5 Mini-popups thématiques, Surprise & Plein Écran -->
+    <!-- Côté droit : Recherche instantanée, Popups thématiques, Surprise & Plein Écran -->
     <div class="flex items-center gap-1.5 pointer-events-auto">
-      <!-- Recherche rapide avec autocomplétion -->
+      <!-- Recherche rapide -->
       <div class="relative">
         <div class="glass-panel flex items-center rounded-2xl px-2.5 py-1.5 focus-within:border-cyan-400/70 transition w-32 sm:w-40 lg:w-44">
           <i class="fa-solid fa-magnifying-glass text-cyan-400 text-xs mr-2 shrink-0"></i>
@@ -203,54 +202,54 @@
         <div id="quick-search-results" class="glass-panel absolute top-full right-0 mt-2 w-64 sm:w-72 rounded-2xl p-1.5 shadow-2xl hidden z-50 max-h-64 overflow-y-auto custom-scrollbar border border-cyan-500/40"></div>
       </div>
 
-      <!-- Mini-icône 1 : Base Casinca & Caps Cardinaux (Trophée) -->
+      <!-- Mini-icône 1 : Base Casinca -->
       <div class="relative">
         <button id="btn-popup-home" onclick="togglePopup('modal-home', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-amber-400 hover:text-white hover:border-amber-400/70 transition shadow" title="Base Castellare & Boussole des Extrêmes">
           <i class="fa-solid fa-award text-xs"></i>
         </button>
       </div>
 
-      <!-- Mini-icône 2 : Baromètre Mondial ONU & Subdivisions (Globe Territoires) -->
+      <!-- Mini-icône 2 : Baromètre Mondial ONU & Subdivisions -->
       <div class="relative">
         <button id="btn-popup-territories" onclick="togglePopup('modal-territories', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-blue-400 hover:text-white hover:border-blue-400/70 transition shadow" title="Baromètre Mondial ONU & Subdivisions Territoriales">
           <i class="fa-solid fa-earth-americas text-xs"></i>
         </button>
       </div>
 
-      <!-- Mini-icône 3 : FILTRE POUSSÉ MULTI-CRITÈRES (PAYS / SIÈCLE / CATÉGORIE / UNESCO) -->
+      <!-- Mini-icône 3 : FILTRE POUSSÉ MULTI-CRITÈRES (avec Île) -->
       <div class="relative">
-        <button id="btn-popup-advanced" onclick="togglePopup('modal-advanced', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-400/70 transition shadow" title="Filtres Poussés Multi-Critères (Siècle, Pays, Catégorie, UNESCO)">
+        <button id="btn-popup-advanced" onclick="togglePopup('modal-advanced', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-400/70 transition shadow" title="Filtres Poussés Multi-Critères (Siècle, Pays, Catégorie, Îles, UNESCO)">
           <i class="fa-solid fa-sliders text-xs"></i>
         </button>
       </div>
 
-      <!-- Mini-icône 4 : Altimètre des Extrêmes & Baromètre Îles (Montagne) -->
+      <!-- Mini-icône 4 : Altimètre & Îles -->
       <div class="relative">
         <button id="btn-popup-altitude" onclick="togglePopup('modal-altitude', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-emerald-400 hover:text-white hover:border-emerald-400/70 transition shadow" title="Altimètre des Extrêmes & Terre Insulaire vs Continent">
           <i class="fa-solid fa-mountain-sun text-xs"></i>
         </button>
       </div>
 
-      <!-- Mini-icône 5 : Chrono-Scope des Civilisations & UNESCO (Sablier) -->
+      <!-- Mini-icône 5 : Chrono-Scope & UNESCO -->
       <div class="relative">
         <button id="btn-popup-chrono" onclick="togglePopup('modal-chrono', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-indigo-300 hover:text-white hover:border-indigo-400/70 transition shadow" title="Chrono-Scope des Civilisations & UNESCO">
           <i class="fa-solid fa-landmark text-xs"></i>
         </button>
       </div>
 
-      <!-- Bouton Destination Surprise -->
+      <!-- Destination Surprise -->
       <button onclick="pickRandomDestination()" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-400/60 transition shadow" title="Destination au hasard (Surprise !)">
         <span class="text-xs sm:text-sm">🎲</span>
       </button>
 
-      <!-- Bouton Plein Écran -->
+      <!-- Plein Écran -->
       <button onclick="toggleFullScreen()" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-slate-300 hover:text-cyan-300 transition shadow" title="Mode plein écran">
         <i id="fullscreen-icon" class="fa-solid fa-expand text-xs"></i>
       </button>
     </div>
   </header>
 
-  <!-- POPUP 1 : BASE CASTELLARE-DI-CASINCA & LES 4 CAPS CARDINAUX -->
+  <!-- MODAL 1 : BASE CASTELLARE & CAPS -->
   <div id="modal-home" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-72 sm:w-80 rounded-2xl p-3.5 shadow-2xl hidden border border-amber-500/50">
     <div class="flex items-center justify-between pb-2 mb-2 border-b border-amber-500/30">
       <div class="flex items-center gap-1.5 text-amber-200 text-xs font-bold uppercase tracking-wider">
@@ -263,7 +262,6 @@
     </div>
 
     <div class="space-y-2 text-xs">
-      <!-- Le Bout du Monde depuis Castellare -->
       <div class="bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/30">
         <div class="text-[9px] uppercase font-bold text-amber-300 flex items-center justify-between">
           <span><i class="fa-solid fa-paper-plane mr-1"></i> Plus lointain de Castellare</span>
@@ -272,10 +270,8 @@
         <div id="stat-home-farthest-name" class="text-xs font-bold text-white mt-1 leading-snug"></div>
       </div>
 
-      <!-- Les 4 Caps Cardinaux Extrêmes de vos voyages -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 space-y-1.5">
         <div class="text-[9px] uppercase font-bold text-indigo-300 tracking-wider">Boussole des Extrêmes</div>
-        
         <div class="grid grid-cols-2 gap-1.5">
           <div class="bg-slate-950/70 p-1.5 rounded-lg border border-slate-800/80">
             <div class="text-[8px] uppercase font-bold text-cyan-400 flex items-center gap-1">
@@ -304,7 +300,6 @@
         </div>
       </div>
 
-      <!-- Envergure Maximale entre deux points de vos voyages -->
       <div class="bg-indigo-950/40 p-2 rounded-xl border border-indigo-500/30">
         <div class="text-[9px] uppercase font-bold text-indigo-300 flex items-center justify-between">
           <span><i class="fa-solid fa-arrows-left-right mr-1"></i> Envergure maximale</span>
@@ -315,7 +310,7 @@
     </div>
   </div>
 
-  <!-- POPUP 2 : BAROMÈTRE MONDIAL ONU & SUBDIVISIONS TERRITORIALES -->
+  <!-- MODAL 2 : BAROMÈTRE MONDIAL ONU & SUBDIVISIONS -->
   <div id="modal-territories" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-80 sm:w-96 rounded-2xl p-3.5 shadow-2xl hidden border border-blue-500/50">
     <div class="flex items-center justify-between pb-2 mb-2 border-b border-blue-500/30">
       <div class="flex items-center gap-1.5 text-blue-200 text-xs font-bold uppercase tracking-wider">
@@ -327,7 +322,6 @@
       </button>
     </div>
 
-    <!-- Sélecteur d'onglets internes -->
     <div class="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl mb-2.5 border border-slate-800">
       <button id="tab-btn-world" onclick="switchTerritoryTab('world')" class="flex-1 py-1 rounded-lg text-[10px] font-bold transition bg-blue-600 text-white shadow">
         🌍 Monde ONU & Continents
@@ -337,9 +331,7 @@
       </button>
     </div>
 
-    <!-- Onglet 1 : Monde ONU & Continents -->
     <div id="tab-content-world" class="space-y-2 text-xs">
-      <!-- Score ONU Global -->
       <div class="bg-blue-950/50 p-2.5 rounded-xl border border-blue-500/30">
         <div class="flex items-center justify-between">
           <span class="text-[9px] uppercase font-bold text-blue-300">🌍 Accomplissement Planétaire ONU</span>
@@ -354,14 +346,12 @@
         </div>
       </div>
 
-      <!-- Progression par Continents -->
       <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800 space-y-1.5">
         <div class="text-[9px] uppercase font-bold text-indigo-300 tracking-wider">Pénétration par Continents</div>
         <div id="stat-continents-container" class="space-y-1.5"></div>
       </div>
     </div>
 
-    <!-- Onglet 2 : Subdivisions Territoriales (France, Égypte, etc.) -->
     <div id="tab-content-subdiv" class="space-y-2 text-xs hidden">
       <div class="text-[9px] text-slate-400 leading-tight">
         Taux d'exploration des maillages administratifs officiels de premier ordre.
@@ -370,7 +360,7 @@
     </div>
   </div>
 
-  <!-- POPUP 3 : FILTRE POUSSÉ MULTI-CRITÈRES DU PATRIMOINE -->
+  <!-- MODAL 3 : FILTRE POUSSÉ MULTI-CRITÈRES -->
   <div id="modal-advanced" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-80 sm:w-96 rounded-2xl p-3.5 shadow-2xl hidden border border-cyan-500/50">
     <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-cyan-500/30">
       <div class="flex items-center gap-1.5 text-cyan-200 text-xs font-bold uppercase tracking-wider">
@@ -383,7 +373,6 @@
     </div>
 
     <div class="space-y-2.5 text-xs">
-      <!-- 4 Critères croisés -->
       <div class="grid grid-cols-2 gap-2">
         <!-- Pays -->
         <div>
@@ -409,23 +398,31 @@
           </select>
         </div>
 
-        <!-- Case UNESCO -->
-        <div class="flex items-end pb-1">
-          <label class="flex items-center gap-1.5 cursor-pointer select-none">
-            <input type="checkbox" id="adv-filter-unesco" onchange="runAdvancedFilter()" class="w-3.5 h-3.5 rounded text-cyan-500 bg-slate-900 border-slate-700 focus:ring-0 cursor-pointer">
-            <span class="text-[10px] font-bold text-amber-300">🏛️ UNESCO seul</span>
-          </label>
+        <!-- Île spécifique (sélection ciblée) -->
+        <div>
+          <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">🏝️ Île spécifique</label>
+          <select id="adv-filter-island" onchange="runAdvancedFilter()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-white focus:outline-none focus:border-cyan-400">
+            <option value="all">Toutes les îles</option>
+          </select>
         </div>
       </div>
 
-      <!-- Compteur de résultats & bouton Réinitialiser -->
+      <!-- Case UNESCO -->
+      <div class="flex items-center justify-between pt-1">
+        <label class="flex items-center gap-1.5 cursor-pointer select-none">
+          <input type="checkbox" id="adv-filter-unesco" onchange="runAdvancedFilter()" class="w-3.5 h-3.5 rounded text-cyan-500 bg-slate-900 border-slate-700 focus:ring-0 cursor-pointer">
+          <span class="text-[10px] font-bold text-amber-300">🏛️ Trésors UNESCO seul</span>
+        </label>
+        <button onclick="resetAdvancedFilters()" class="text-slate-400 hover:text-cyan-300 underline font-semibold text-[9px]">
+          Réinitialiser
+        </button>
+      </div>
+
+      <!-- Compteur de résultats -->
       <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-[10px]">
         <div class="text-slate-300">
           Résultats : <span id="adv-results-count" class="font-bold text-cyan-300 font-mono">0</span> site(s)
         </div>
-        <button onclick="resetAdvancedFilters()" class="text-slate-400 hover:text-cyan-300 underline font-semibold text-[9px]">
-          Réinitialiser
-        </button>
       </div>
 
       <!-- Liste scrollable des résultats trouvés -->
@@ -433,7 +430,7 @@
     </div>
   </div>
 
-  <!-- POPUP 4 : ALTIMÈTRE DES EXTRÊMES & BAROMÈTRE DES ÎLES -->
+  <!-- MODAL 4 : ALTIMÈTRE DES EXTRÊMES & BAROMÈTRE DES ÎLES -->
   <div id="modal-altitude" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-72 sm:w-80 rounded-2xl p-3.5 shadow-2xl hidden border border-emerald-500/50">
     <div class="flex items-center justify-between pb-2 mb-2 border-b border-emerald-500/30">
       <div class="flex items-center gap-1.5 text-emerald-200 text-xs font-bold uppercase tracking-wider">
@@ -446,7 +443,6 @@
     </div>
 
     <div class="space-y-2 text-xs">
-      <!-- Le Grand Écart Vertical -->
       <div class="grid grid-cols-2 gap-1.5">
         <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
           <div class="text-[8px] uppercase font-bold text-emerald-400 flex items-center gap-1">
@@ -465,7 +461,6 @@
         </div>
       </div>
 
-      <!-- Amplitude Verticale Totale -->
       <div class="bg-emerald-950/40 p-2 rounded-xl border border-emerald-500/30 flex items-center justify-between">
         <div>
           <div class="text-[9px] uppercase font-bold text-emerald-300">Amplitude Verticale Conquise</div>
@@ -474,10 +469,9 @@
         <span id="stat-alt-amplitude" class="font-mono text-emerald-200 font-black text-xs">0 m</span>
       </div>
 
-      <!-- Baromètre Îles vs Continent -->
       <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800 space-y-1">
         <div class="flex justify-between items-center text-[9px] font-bold">
-          <span class="text-cyan-300"><i class="fa-solid fa-umbrella-beach mr-1"></i> Terres Insulaires : <span id="stat-islands-pct">0%</span></span>
+          <span class="text-cyan-300"><i class="fa-solid fa-anchor mr-1"></i> Terres Insulaires : <span id="stat-islands-pct">0%</span></span>
           <span class="text-amber-300">Continent : <span id="stat-mainland-pct">0%</span> <i class="fa-solid fa-earth-europe ml-1"></i></span>
         </div>
         <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden flex">
@@ -489,7 +483,7 @@
     </div>
   </div>
 
-  <!-- POPUP 5 : CHRONO-SCOPE (FRISE DES CIVILISATIONS) & UNESCO -->
+  <!-- MODAL 5 : CHRONO-SCOPE & UNESCO -->
   <div id="modal-chrono" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-72 sm:w-80 rounded-2xl p-3.5 shadow-2xl hidden border border-indigo-500/50">
     <div class="flex items-center justify-between pb-2 mb-2 border-b border-indigo-500/30">
       <div class="flex items-center gap-1.5 text-indigo-200 text-xs font-bold uppercase tracking-wider">
@@ -502,7 +496,6 @@
     </div>
 
     <div class="space-y-2 text-xs">
-      <!-- Patrimoine UNESCO -->
       <div class="bg-indigo-950/60 p-2 rounded-xl border border-indigo-500/30 flex items-center justify-between">
         <div>
           <div class="text-[9px] uppercase font-bold text-indigo-300">Trésors UNESCO Visités</div>
@@ -513,7 +506,6 @@
         </div>
       </div>
 
-      <!-- Frise Chronologique des Civilisations -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 space-y-1.5">
         <div class="text-[9px] uppercase font-bold text-slate-300 tracking-wider">Époques Traversées (+3 500 ans)</div>
         <div id="stat-chrono-breakdown" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar-indigo pr-1"></div>
@@ -521,7 +513,7 @@
     </div>
   </div>
 
-  <!-- Volet gauche des filtres (compact et calibré pour nombres à 3 chiffres) -->
+  <!-- Volet gauche des filtres -->
   <aside id="left-dock" class="absolute top-16 left-3 z-30 flex items-start pointer-events-auto">
     <div class="flex items-start">
       <div id="filters-panel" class="glass-panel rounded-2xl p-2.5 shadow-2xl w-48 sm:w-52 overflow-y-auto custom-scrollbar panel-transition relative max-h-[calc(100vh-6rem)]">
@@ -546,7 +538,7 @@
     </div>
   </aside>
 
-  <!-- Volet d'information du site sélectionné avec Navigation Précédent / Suivant -->
+  <!-- Volet d'information du site sélectionné -->
   <section id="destination-card" class="absolute top-16 right-3 z-40 glass-panel rounded-2xl p-3 shadow-2xl border border-cyan-500/40 hidden pointer-events-auto transition-all duration-300 w-[270px] sm:w-[285px] flex flex-col justify-between max-h-[calc(100vh-5rem)] overflow-y-auto custom-scrollbar">
     <div class="relative flex flex-col gap-2">
       <!-- Barre d'outils du haut : Navigation ◀ / ▶ et Fermeture -->
@@ -555,7 +547,7 @@
           <button onclick="navigateSpot(-1)" class="w-6 h-6 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 flex items-center justify-center text-[10px] border border-slate-700 transition" title="Lieu précédent">
             <i class="fa-solid fa-chevron-left"></i>
           </button>
-          <span id="card-spot-index" class="text-[9px] font-mono text-slate-400 px-1">1 / 15</span>
+          <span id="card-spot-index" class="text-[9px] font-mono text-slate-400 px-1">1 / 16</span>
           <button onclick="navigateSpot(1)" class="w-6 h-6 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 flex items-center justify-center text-[10px] border border-slate-700 transition" title="Lieu suivant">
             <i class="fa-solid fa-chevron-right"></i>
           </button>
@@ -893,6 +885,7 @@
         subdiv: "Assouan",
         altitude: 110,
         is_island: true,
+        island_name: "Philae (Agilkia)",
         transport: "bateau",
         era_group: "ptolemaique",
         era_label: "Période Ptolémaïque & Romaine (-380)",
@@ -916,6 +909,7 @@
         subdiv: "Assouan",
         altitude: 98,
         is_island: true,
+        island_name: "Éléphantine",
         transport: "bateau",
         era_group: "pharaonique",
         era_label: "Antiquité Pharaonique & Cité d'Abou",
@@ -963,6 +957,7 @@
         region_admin: "Corse",
         altitude: 1743,
         is_island: true,
+        island_name: "Corse",
         transport: "route",
         era_group: "nature",
         era_label: "Ère Glaciaire & Temps Géologique",
@@ -987,6 +982,7 @@
         region_admin: "Corse",
         altitude: 35,
         is_island: true,
+        island_name: "Corse",
         transport: "route",
         era_group: "medievale",
         era_label: "Époque Génoise (XVIe siècle - 1562)",
@@ -1011,6 +1007,7 @@
         region_admin: "Corse",
         altitude: 240,
         is_island: true,
+        island_name: "Corse",
         transport: "route",
         era_group: "medievale",
         era_label: "Époque Génoise & Pastorale",
@@ -1050,6 +1047,7 @@
       }
     ];
 
+    // Dictionnaire officiel des filtres : Culture et Nature (avec l'item Île)
     const CATEGORIES = {
       ville: { label: "Ville / Village", icon: "fa-city", color: "#b45309", section: "culture", active: true },
       musee: { label: "Musée", icon: "fa-landmark", color: "#a16207", section: "culture", active: true },
@@ -1062,6 +1060,7 @@
       cascade: { label: "Cascade", icon: "fa-water", color: "#0284c7", section: "nature", active: true },
       lac: { label: "Lac", icon: "fa-droplet", color: "#0ea5e9", section: "nature", active: true },
       plage: { label: "Plage / Plongée", icon: "fa-umbrella-beach", color: "#06b6d4", section: "nature", active: true },
+      ile: { label: "Île", icon: "fa-anchor", color: "#0891b2", section: "nature", active: true },
       grotte: { label: "Grotte", icon: "fa-mountain", color: "#0369a1", section: "nature", active: true },
       volcan: { label: "Volcan", icon: "fa-volcano", color: "#dc2626", section: "nature", active: true },
       rando: { label: "Rando", icon: "fa-person-hiking", color: "#059669", section: "nature", active: true },
@@ -1103,6 +1102,118 @@
     let clusterDebounceTimeout = null;
     let isCountriesMenuOpen = false;
 
+    function isOnlyIslandFilterActive() {
+      if (!CATEGORIES.ile || !CATEGORIES.ile.active) return false;
+      return Object.keys(CATEGORIES).every(key => key === 'ile' ? CATEGORIES[key].active : !CATEGORIES[key].active);
+    }
+
+    function getIslandClustersData() {
+      const islandMap = new Map();
+      travelSpots.forEach(s => {
+        if (!s.is_island) return;
+        const isl = s.island_name || s.name;
+        if (!islandMap.has(isl)) {
+          islandMap.set(isl, {
+            islandName: isl,
+            spots: [],
+            flag: s.flag || '📍',
+            country: s.country
+          });
+        }
+        islandMap.get(isl).spots.push(s);
+      });
+
+      const clusters = [];
+      islandMap.forEach((entry, isl) => {
+        const count = entry.spots.length;
+        const avgLat = entry.spots.reduce((sum, sp) => sum + sp.lat, 0) / count;
+        const avgLng = entry.spots.reduce((sum, sp) => sum + sp.lng, 0) / count;
+        clusters.push({
+          isIslandCluster: true,
+          islandName: isl,
+          count: count,
+          lat: avgLat,
+          lng: avgLng,
+          spots: entry.spots,
+          flag: entry.flag,
+          country: entry.country
+        });
+      });
+      return clusters;
+    }
+
+    function openIslandSummaryCard(islandCluster) {
+      currentSelectedSpot = islandCluster.spots[0];
+      const card = document.getElementById('destination-card');
+      const flagEl = document.getElementById('card-flag');
+      const regionEl = document.getElementById('card-country-region');
+      const img = document.getElementById('card-img');
+      const tagsContainer = document.getElementById('card-photo-tags');
+      const title = document.getElementById('card-title');
+      const location = document.getElementById('card-location');
+      const desc = document.getElementById('card-description');
+      const visiter = document.getElementById('card-visiter');
+      const link = document.getElementById('card-link');
+      const gmapsLink = document.getElementById('card-gmaps-link');
+      const indexEl = document.getElementById('card-spot-index');
+
+      if (indexEl) indexEl.innerText = `Île : ${islandCluster.islandName}`;
+      flagEl.innerText = islandCluster.flag || '🏝️';
+      regionEl.innerText = `${islandCluster.country} · Territoire Insulaire`;
+      img.src = islandCluster.spots[0].image;
+
+      tagsContainer.innerHTML = `
+        <div class="px-2 py-0.5 rounded-lg text-[9px] font-bold text-white uppercase tracking-wider shadow flex items-center gap-1 border border-white/20 bg-cyan-700">
+          <i class="fa-solid fa-anchor"></i><span>Île (${islandCluster.islandName})</span>
+        </div>
+        <div class="px-2 py-0.5 rounded-lg text-[9px] font-bold text-cyan-200 uppercase tracking-wider shadow flex items-center gap-1 border border-cyan-500/40 bg-slate-900">
+          <i class="fa-solid fa-map-pin"></i><span>${islandCluster.count} site${islandCluster.count > 1 ? 's' : ''} exploré${islandCluster.count > 1 ? 's' : ''}</span>
+        </div>
+      `;
+
+      title.innerText = `Île de ${islandCluster.islandName}`;
+      location.querySelector('span').innerText = `${islandCluster.lat.toFixed(4)}°N, ${islandCluster.lng.toFixed(4)}°E (Moyenne)`;
+      
+      desc.innerHTML = `
+        Cette terre insulaire abrite <strong>${islandCluster.count} site${islandCluster.count > 1 ? 's majeurs' : ' majeur'}</strong> de vos voyages :
+        <ul class="list-disc pl-4 mt-1.5 space-y-1">
+          ${islandCluster.spots.map(s => `<li><strong>${s.name}</strong> (${s.century || s.era_label})</li>`).join('')}
+        </ul>
+      `;
+
+      visiter.innerHTML = `
+        <div class="text-slate-300">
+          Cliquez ci-dessous pour ouvrir l'un des sites insulaires :
+          <div class="flex flex-col gap-1 mt-1.5">
+            ${islandCluster.spots.map(s => `
+              <button onclick="selectSpotById('${s.id}')" class="text-left px-2 py-1 rounded bg-slate-800 hover:bg-cyan-900/60 border border-slate-700 text-cyan-300 font-semibold text-[10px] flex items-center justify-between">
+                <span>${s.name}</span> <i class="fa-solid fa-chevron-right text-[8px]"></i>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      link.href = islandCluster.spots[0].link;
+      if (gmapsLink) {
+        gmapsLink.href = `https://www.google.com/maps/search/?api=1&query=${islandCluster.lat},${islandCluster.lng}`;
+      }
+
+      updateSpotToggleButton();
+      card.classList.remove('hidden');
+
+      if (currentMode === 'globe' && myGlobe) {
+        myGlobe.pointOfView({ lat: islandCluster.lat, lng: islandCluster.lng, altitude: 0.5 }, 1000);
+      } else if (currentMode === 'map' && myLeafletMap) {
+        myLeafletMap.flyTo([islandCluster.lat, islandCluster.lng], 9, { duration: 1.0 });
+      }
+    }
+
+    function selectSpotById(id) {
+      const spot = travelSpots.find(s => s.id === id);
+      if (spot) selectSpot(spot);
+    }
+
     function toggleFiltersPanel() {
       isFiltersPanelOpen = !isFiltersPanelOpen;
       const panel = document.getElementById('filters-panel');
@@ -1128,7 +1239,6 @@
       }
     }
 
-    /* Menu déroulant Pays visités */
     function toggleCountriesMenu(event) {
       if (event) event.stopPropagation();
       isCountriesMenuOpen = !isCountriesMenuOpen;
@@ -1215,7 +1325,6 @@
       }
     }
 
-    /* Formule de Haversine (distance géodésique sphérique en km) */
     function getHaversineDistanceKm(lat1, lon1, lat2, lon2) {
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1227,7 +1336,6 @@
       return Math.round(R * c);
     }
 
-    /* GESTION UNIQUE DES 5 POPUPS */
     function togglePopup(popupId, event) {
       if (event) event.stopPropagation();
       const popup = document.getElementById(popupId);
@@ -1275,14 +1383,30 @@
       }
     }
 
-    /* MODULE FILTRE POUSSÉ MULTI-CRITÈRES AVEC CHRONOLOGIE STRICTE */
+    function spotMatchesCentury(spot, selectedCentury) {
+      if (!selectedCentury || selectedCentury === 'all') return true;
+      const spotCent = (spot.century || "").toLowerCase();
+      const selCent = selectedCentury.toLowerCase();
+
+      if (selCent === 'antiquité') {
+        return spotCent.includes('antiquité') || spot.era_group === 'pharaonique' || spot.era_group === 'ptolemaique';
+      }
+
+      const cleanSel = selCent.replace('siècle', '').trim();
+      const isNegative = spotCent.includes('av. j.-c.');
+      if (isNegative) return false;
+
+      return spotCent.includes(cleanSel);
+    }
+
     function initAdvancedFilterOptions() {
       const selectCountry = document.getElementById('adv-filter-country');
       const selectCategory = document.getElementById('adv-filter-category');
       const selectCentury = document.getElementById('adv-filter-century');
+      const selectIsland = document.getElementById('adv-filter-island');
 
-      if (!selectCountry || !selectCategory || !selectCentury) return;
-      if (selectCentury.children.length > 1) return; // Déjà initialisé
+      if (!selectCountry || !selectCategory || !selectCentury || !selectIsland) return;
+      if (selectCentury.children.length > 1) return;
 
       // 1. Remplissage des pays
       const countries = Array.from(new Set(travelSpots.map(s => s.country))).sort((a,b) => a.localeCompare(b,'fr'));
@@ -1301,44 +1425,47 @@
         selectCategory.appendChild(opt);
       });
 
-      // 3. Remplissage chronologique rigoureux : Antiquité puis Ve au XXIe siècle (sans ère glaciaire)
+      // 3. Remplissage chronologique rigoureux
       CHRONOLOGICAL_CENTURIES.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c;
         opt.innerText = c;
         selectCentury.appendChild(opt);
       });
-    }
 
-    function spotMatchesCentury(spot, centuryVal) {
-      if (centuryVal === 'all') return true;
-      const sc = spot.century || "";
-
-      if (centuryVal === "Antiquité") {
-        return sc.toLowerCase().includes("antiquité") || 
-               sc.includes("av. J.-C.") || 
-               spot.era_group === "pharaonique" || 
-               spot.era_group === "ptolemaique";
-      }
-
-      // Siècle précis après l'Antiquité (Ve au XXIe) : exclut expressément l'Antiquité (av. J.-C.)
-      if (sc.includes("av. J.-C.")) return false;
-      return sc.includes(centuryVal);
+      // 4. Remplissage des îles uniques
+      const uniqueIslands = Array.from(new Set(travelSpots.filter(s => s.is_island).map(s => s.island_name))).sort((a,b) => a.localeCompare(b,'fr'));
+      uniqueIslands.forEach(isl => {
+        const opt = document.createElement('option');
+        opt.value = isl;
+        const count = travelSpots.filter(s => s.island_name === isl).length;
+        opt.innerText = `🏝️ ${isl} (${count} site${count > 1 ? 's' : ''})`;
+        selectIsland.appendChild(opt);
+      });
     }
 
     function runAdvancedFilter() {
       const countryVal = document.getElementById('adv-filter-country')?.value || 'all';
       const catVal = document.getElementById('adv-filter-category')?.value || 'all';
       const centuryVal = document.getElementById('adv-filter-century')?.value || 'all';
+      const islandVal = document.getElementById('adv-filter-island')?.value || 'all';
       const unescoOnly = document.getElementById('adv-filter-unesco')?.checked || false;
 
       const filtered = travelSpots.filter(s => {
         if (countryVal !== 'all' && s.country !== countryVal) return false;
         
         if (catVal !== 'all') {
-          const hasCount = s.counts && typeof s.counts[catVal] === 'number' && s.counts[catVal] > 0;
-          const isDirectCat = s.category === catVal;
-          if (!hasCount && !isDirectCat) return false;
+          if (catVal === 'ile') {
+            if (!s.is_island && (!s.counts || !s.counts.ile)) return false;
+          } else {
+            const hasCount = s.counts && typeof s.counts[catVal] === 'number' && s.counts[catVal] > 0;
+            const isDirectCat = s.category === catVal;
+            if (!hasCount && !isDirectCat) return false;
+          }
+        }
+
+        if (islandVal !== 'all') {
+          if (s.island_name !== islandVal) return false;
         }
 
         if (!spotMatchesCentury(s, centuryVal)) return false;
@@ -1369,11 +1496,12 @@
       filtered.forEach(spot => {
         const item = document.createElement('div');
         item.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-900/70 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 cursor-pointer transition select-none group';
+        const islandBadge = spot.is_island ? `<span class="px-1 py-0.2 rounded text-[8px] bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-bold ml-1">🏝️ ${spot.island_name}</span>` : '';
         item.innerHTML = `
           <div class="flex items-center gap-2 min-w-0 pr-1">
             <span class="text-sm shrink-0 group-hover:scale-110 transition-transform">${spot.flag || '📍'}</span>
             <div class="min-w-0">
-              <div class="text-[11px] font-bold text-white truncate">${spot.name}</div>
+              <div class="text-[11px] font-bold text-white truncate flex items-center">${spot.name} ${islandBadge}</div>
               <div class="text-[9px] text-cyan-400 truncate">${spot.country} · ${spot.century || spot.era_group || ''}</div>
             </div>
           </div>
@@ -1391,15 +1519,16 @@
       const c = document.getElementById('adv-filter-country');
       const k = document.getElementById('adv-filter-category');
       const t = document.getElementById('adv-filter-century');
+      const isl = document.getElementById('adv-filter-island');
       const u = document.getElementById('adv-filter-unesco');
       if (c) c.value = 'all';
       if (k) k.value = 'all';
       if (t) t.value = 'all';
+      if (isl) isl.value = 'all';
       if (u) u.checked = false;
       runAdvancedFilter();
     }
 
-    /* MOTEUR CENTRALISÉ DES STATISTIQUES (0% CPU au repos - Temps d'exécution : < 1 ms) */
     function computeAllStatistics() {
       if (!travelSpots || travelSpots.length === 0) return;
 
@@ -1622,11 +1751,14 @@
       const barMain = document.getElementById('stat-bar-mainland');
       const noteIsl = document.getElementById('stat-islands-note');
 
+      // Nombre d'îles uniques explorées
+      const uniqueIslandsCount = new Set(travelSpots.filter(s => s.is_island).map(s => s.island_name || s.name)).size;
+
       if (islPctEl) islPctEl.innerText = `${islandPct}%`;
       if (mainPctEl) mainPctEl.innerText = `${mainlandPct}%`;
       if (barIsl) barIsl.style.width = `${islandPct}%`;
       if (barMain) barMain.style.width = `${mainlandPct}%`;
-      if (noteIsl) noteIsl.innerText = `« Vous passez ${islandPct}% de vos explorations les pieds entourés d'eau (Corse & îles du Nil) ! »`;
+      if (noteIsl) noteIsl.innerText = `« ${uniqueIslandsCount} îles explorées : vous passez ${islandPct}% de vos explorations les pieds entourés d'eau ! »`;
 
       // --- POPUP 5 : CHRONO-SCOPE & UNESCO ---
       const unescoCountVal = document.getElementById('stat-unesco-count-val');
@@ -1658,7 +1790,6 @@
       }
     }
 
-    /* Navigation Précédent / Suivant (◀ / ▶) */
     function navigateSpot(direction) {
       if (!travelSpots || travelSpots.length === 0) return;
       const currentIndex = currentSelectedSpot ? travelSpots.findIndex(s => s.id === currentSelectedSpot.id) : 0;
@@ -1668,20 +1799,17 @@
       selectSpot(travelSpots[nextIndex]);
     }
 
-    /* Copie GPS instantanée */
     function copyCurrentGPS() {
       if (!currentSelectedSpot) return;
       const text = `${currentSelectedSpot.lat.toFixed(4)}, ${currentSelectedSpot.lng.toFixed(4)}`;
-      navigator.clipboard.writeText(text).then(() => {
-        const feedback = document.getElementById('copy-gps-feedback');
-        if (feedback) {
-          feedback.innerText = "Copié !";
-          setTimeout(() => { feedback.innerText = "GPS"; }, 1500);
-        }
-      });
+      document.execCommand('copy');
+      const feedback = document.getElementById('copy-gps-feedback');
+      if (feedback) {
+        feedback.innerText = "Copié !";
+        setTimeout(() => { feedback.innerText = "GPS"; }, 1500);
+      }
     }
 
-    /* Recherche rapide en temps réel */
     function handleQuickSearch(query) {
       const q = (query || "").trim().toLowerCase();
       const resultsContainer = document.getElementById('quick-search-results');
@@ -1769,7 +1897,6 @@
       }
     }
 
-    // Fermeture automatique au clic à l'extérieur
     document.addEventListener('click', (e) => {
       const countryMenu = document.getElementById('countries-dropdown');
       const countryBtn = document.getElementById('btn-dropdown-countries');
@@ -1854,6 +1981,26 @@
         .htmlElement(d => {
           const anchor = document.createElement('div');
           anchor.className = 'globe-marker-anchor group';
+
+          if (d.isIslandCluster) {
+            anchor.innerHTML = `
+              <div class="relative flex items-center justify-center pointer-events-auto">
+                <div class="px-2.5 py-1 rounded-full flex items-center gap-1.5 text-white font-bold text-xs bg-cyan-950/95 border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.7)] cursor-pointer hover:scale-120 transition-transform duration-150">
+                  <span class="text-xs">🏝️</span>
+                  <span class="font-mono text-xs font-black tracking-tight text-cyan-200">${d.islandName}</span>
+                  <span class="px-1 py-0.2 rounded-full bg-cyan-500 text-slate-950 text-[10px] font-black">${d.count}</span>
+                </div>
+                <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none whitespace-nowrap px-2 py-0.5 rounded-lg bg-slate-950/95 border border-cyan-400/50 text-[10px] font-bold text-cyan-300 shadow-xl z-50">
+                  Île (${d.islandName}) : ${d.count} site${d.count > 1 ? 's' : ''}
+                </div>
+              </div>
+            `;
+            anchor.onclick = (e) => {
+              e.stopPropagation();
+              openIslandSummaryCard(d);
+            };
+            return anchor;
+          }
 
           if (d.isCluster) {
             const count = d.count;
@@ -1996,6 +2143,34 @@
       if (!myLeafletMap || !leafletMarkersGroup) return;
       leafletMarkersGroup.clearLayers();
 
+      if (isOnlyIslandFilterActive()) {
+        const islandClusters = getIslandClustersData();
+        islandClusters.forEach(cluster => {
+          const islandIcon = L.divIcon({
+            className: 'custom-island-pin',
+            html: `
+              <div class="px-2 py-1 rounded-full flex items-center gap-1 bg-cyan-950 border-2 border-cyan-400 text-white shadow-xl cursor-pointer hover:scale-115 transition">
+                <span class="text-[11px]">🏝️</span>
+                <span class="font-bold text-[10px] text-cyan-200">${cluster.islandName}</span>
+                <span class="px-1 py-0.2 rounded-full bg-cyan-500 text-slate-950 font-black text-[9px]">${cluster.count}</span>
+              </div>
+            `,
+            iconSize: [95, 26],
+            iconAnchor: [47, 13]
+          });
+
+          const marker = L.marker([cluster.lat, cluster.lng], { icon: islandIcon });
+          marker.bindTooltip(`<span>🏝️ ${cluster.islandName} (${cluster.count} site${cluster.count > 1 ? 's' : ''})</span>`, {
+            direction: 'top',
+            offset: [0, -12],
+            className: 'custom-leaflet-tooltip'
+          });
+          marker.on('click', () => openIslandSummaryCard(cluster));
+          leafletMarkersGroup.addLayer(marker);
+        });
+        return;
+      }
+
       getFilteredSpots().forEach(spot => {
         const activeCatKey = getFirstActiveCategoryForSpot(spot);
         const cat = CATEGORIES[activeCatKey] || CATEGORIES[spot.category] || { color: '#06b6d4', icon: 'fa-location-dot' };
@@ -2125,6 +2300,9 @@
       if (spotCategories.length === 0 && spot.category) {
         spotCategories.push(spot.category);
       }
+      if (spot.is_island && !spotCategories.includes('ile')) {
+        spotCategories.push('ile');
+      }
 
       spotCategories.forEach(catKey => {
         const cat = CATEGORIES[catKey];
@@ -2132,7 +2310,8 @@
         const tag = document.createElement('div');
         tag.className = 'px-2 py-0.5 rounded-lg text-[9px] font-bold text-white uppercase tracking-wider shadow flex items-center gap-1 border border-white/20';
         tag.style.backgroundColor = cat.color;
-        tag.innerHTML = `<i class="fa-solid ${cat.icon}"></i><span>${cat.label}</span>`;
+        const labelText = (catKey === 'ile' && spot.island_name) ? `Île (${spot.island_name})` : cat.label;
+        tag.innerHTML = `<i class="fa-solid ${cat.icon}"></i><span>${labelText}</span>`;
         tagsContainer.appendChild(tag);
       });
 
@@ -2187,11 +2366,6 @@
       }
     }
 
-    function resetGlobalView() {
-      closeSpotCard();
-      setViewingMode('globe', { lat: 27.2579, lng: 33.8116, altitude: 2.1 });
-    }
-
     function spotMatchesActiveFilters(spot) {
       let matched = false;
       if (spot.counts) {
@@ -2200,6 +2374,9 @@
         });
       }
       if (!matched && spot.category && CATEGORIES[spot.category] && CATEGORIES[spot.category].active) {
+        matched = true;
+      }
+      if (!matched && CATEGORIES.ile && CATEGORIES.ile.active && spot.is_island) {
         matched = true;
       }
       return matched;
@@ -2214,6 +2391,9 @@
       if (spot.category && CATEGORIES[spot.category] && CATEGORIES[spot.category].active) {
         return spot.category;
       }
+      if (CATEGORIES.ile && CATEGORIES.ile.active && spot.is_island) {
+        return 'ile';
+      }
       return spot.category;
     }
 
@@ -2223,12 +2403,18 @@
 
     function updateGlobeDisplay() {
       if (!myGlobe) return;
+
+      if (isOnlyIslandFilterActive()) {
+        const islandClusters = getIslandClustersData();
+        myGlobe.htmlElementsData(islandClusters);
+        updateStats();
+        return;
+      }
       
       const filteredSpots = getFilteredSpots();
       const pov = myGlobe.pointOfView();
       const altitude = (pov && typeof pov.altitude === 'number' && !isNaN(pov.altitude)) ? pov.altitude : 2.0;
 
-      // Culling de l'hémisphère caché (0 charge GPU au verso)
       const visibleSpots = filteredSpots.filter(spot => {
         const dLat = (spot.lat - (pov.lat || 0)) * Math.PI / 180;
         const dLng = (spot.lng - (pov.lng || 0)) * Math.PI / 180;
@@ -2325,13 +2511,26 @@
         }
 
         let count = 0;
-        travelSpots.forEach(s => {
-          if (s.counts && typeof s.counts[key] === 'number') {
-            count += s.counts[key];
-          } else if (s.category === key) {
-            count += 1;
-          }
-        });
+        let tooltipText = '';
+
+        if (key === 'ile') {
+          const uniqueIslands = new Set();
+          travelSpots.forEach(s => {
+            if (s.is_island) {
+              uniqueIslands.add(s.island_name || s.name);
+            }
+          });
+          count = uniqueIslands.size;
+          tooltipText = ` title="Îles explorées (${count}) : ${Array.from(uniqueIslands).join(', ')}"`;
+        } else {
+          travelSpots.forEach(s => {
+            if (s.counts && typeof s.counts[key] === 'number') {
+              count += s.counts[key];
+            } else if (s.category === key) {
+              count += 1;
+            }
+          });
+        }
 
         const row = document.createElement('label');
         row.className = 'flex items-center justify-between p-1 rounded-lg bg-slate-900/60 hover:bg-slate-800/80 cursor-pointer transition select-none border border-slate-800/60';
@@ -2343,7 +2542,7 @@
             </div>
             <span class="text-slate-200 text-[10px] font-medium truncate">${cat.label}</span>
           </div>
-          <span class="min-w-[26px] text-center font-mono font-bold text-[9px] px-1 py-0.5 rounded bg-slate-950/70 border border-slate-800 shrink-0 ${count > 0 ? 'text-cyan-300' : 'text-slate-500'}">${count}</span>
+          <span class="min-w-[26px] text-center font-mono font-bold text-[9px] px-1 py-0.5 rounded bg-slate-950/70 border border-slate-800 shrink-0 ${count > 0 ? 'text-cyan-300' : 'text-slate-500'}"${tooltipText}>${count}</span>
         `;
         container.appendChild(row);
       });
