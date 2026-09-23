@@ -217,10 +217,10 @@
         </button>
       </div>
 
-      <!-- Mini-icône 3 : Kilométrage Différencié Avion / Route / Mer (Compas) -->
+      <!-- Mini-icône 3 : FILTRE POUSSÉ MULTI-CRITÈRES (PAYS / SIÈCLE / CATÉGORIE / UNESCO) -->
       <div class="relative">
-        <button id="btn-popup-odyssey" onclick="togglePopup('modal-odyssey', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-400/70 transition shadow" title="Kilométrage Avion, Route & Mer">
-          <i class="fa-solid fa-route text-xs"></i>
+        <button id="btn-popup-advanced" onclick="togglePopup('modal-advanced', event)" class="glass-panel w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-400/70 transition shadow" title="Filtres Poussés Multi-Critères (Siècle, Pays, Catégorie, UNESCO)">
+          <i class="fa-solid fa-sliders text-xs"></i>
         </button>
       </div>
 
@@ -370,65 +370,66 @@
     </div>
   </div>
 
-  <!-- POPUP 3 : KILOMÉTRAGE DIFFÉRENCIÉ (AVION / ROUTE / MER) -->
-  <div id="modal-odyssey" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-72 sm:w-80 rounded-2xl p-3.5 shadow-2xl hidden border border-cyan-500/50">
-    <div class="flex items-center justify-between pb-2 mb-2 border-b border-cyan-500/30">
+  <!-- POPUP 3 : FILTRE POUSSÉ MULTI-CRITÈRES DU PATRIMOINE -->
+  <div id="modal-advanced" class="glass-panel-indigo absolute top-16 right-3 sm:right-16 z-50 w-80 sm:w-96 rounded-2xl p-3.5 shadow-2xl hidden border border-cyan-500/50">
+    <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-cyan-500/30">
       <div class="flex items-center gap-1.5 text-cyan-200 text-xs font-bold uppercase tracking-wider">
-        <i class="fa-solid fa-route text-cyan-400"></i>
-        <span>Kilométrage Différencié</span>
+        <i class="fa-solid fa-sliders text-cyan-400"></i>
+        <span>Filtre Poussé Multi-Critères</span>
       </div>
       <button onclick="closeAllPopups()" class="text-slate-400 hover:text-white text-xs">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
-    <div class="space-y-2 text-xs">
-      <!-- Distance totale explorée -->
-      <div class="bg-cyan-950/40 p-2.5 rounded-xl border border-cyan-500/30">
-        <div class="text-[9px] uppercase font-bold text-cyan-300 flex items-center justify-between">
-          <span><i class="fa-solid fa-gauge-high mr-1"></i> Distance Cumulée Explorée</span>
-          <span id="stat-odyssey-total-km" class="font-mono text-cyan-200 font-black text-xs">0 km</span>
+    <div class="space-y-2.5 text-xs">
+      <!-- 4 Critères croisés -->
+      <div class="grid grid-cols-2 gap-2">
+        <!-- Pays -->
+        <div>
+          <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">🌍 Pays</label>
+          <select id="adv-filter-country" onchange="runAdvancedFilter()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-white focus:outline-none focus:border-cyan-400">
+            <option value="all">Tous les pays</option>
+          </select>
         </div>
-        <div class="text-[9px] text-slate-400 mt-1">Rayon combiné d'expéditions depuis la Corse.</div>
+
+        <!-- Catégorie -->
+        <div>
+          <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">🏷️ Catégorie</label>
+          <select id="adv-filter-category" onchange="runAdvancedFilter()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-white focus:outline-none focus:border-cyan-400">
+            <option value="all">Toutes catégories</option>
+          </select>
+        </div>
+
+        <!-- Siècle / Époque ordonné chronologiquement -->
+        <div>
+          <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">⏳ Siècle / Époque</label>
+          <select id="adv-filter-century" onchange="runAdvancedFilter()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-white focus:outline-none focus:border-cyan-400">
+            <option value="all">Tous les siècles</option>
+          </select>
+        </div>
+
+        <!-- Case UNESCO -->
+        <div class="flex items-end pb-1">
+          <label class="flex items-center gap-1.5 cursor-pointer select-none">
+            <input type="checkbox" id="adv-filter-unesco" onchange="runAdvancedFilter()" class="w-3.5 h-3.5 rounded text-cyan-500 bg-slate-900 border-slate-700 focus:ring-0 cursor-pointer">
+            <span class="text-[10px] font-bold text-amber-300">🏛️ UNESCO seul</span>
+          </label>
+        </div>
       </div>
 
-      <!-- Répartition par Mode de Transport -->
-      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 space-y-2">
-        <div class="text-[9px] uppercase font-bold text-slate-300 tracking-wider">Modes de Transport</div>
-        
-        <!-- Avion -->
-        <div class="space-y-0.5">
-          <div class="flex justify-between items-center text-[10px]">
-            <span class="text-blue-300 font-medium"><i class="fa-solid fa-plane-departure mr-1 text-blue-400"></i> Aérien (Avion)</span>
-            <span id="stat-km-air" class="font-mono text-white font-bold">0 km</span>
-          </div>
-          <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
-            <div id="stat-bar-air" class="bg-blue-500 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
-          </div>
+      <!-- Compteur de résultats & bouton Réinitialiser -->
+      <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-[10px]">
+        <div class="text-slate-300">
+          Résultats : <span id="adv-results-count" class="font-bold text-cyan-300 font-mono">0</span> site(s)
         </div>
-
-        <!-- Route & Rando -->
-        <div class="space-y-0.5">
-          <div class="flex justify-between items-center text-[10px]">
-            <span class="text-emerald-300 font-medium"><i class="fa-solid fa-car mr-1 text-emerald-400"></i> Terrestre (Route & Rando)</span>
-            <span id="stat-km-road" class="font-mono text-white font-bold">0 km</span>
-          </div>
-          <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
-            <div id="stat-bar-road" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
-          </div>
-        </div>
-
-        <!-- Bateau / Croisière -->
-        <div class="space-y-0.5">
-          <div class="flex justify-between items-center text-[10px]">
-            <span class="text-cyan-300 font-medium"><i class="fa-solid fa-ship mr-1 text-cyan-400"></i> Navigation (Nil & Mer)</span>
-            <span id="stat-km-sea" class="font-mono text-white font-bold">0 km</span>
-          </div>
-          <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
-            <div id="stat-bar-sea" class="bg-cyan-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
-          </div>
-        </div>
+        <button onclick="resetAdvancedFilters()" class="text-slate-400 hover:text-cyan-300 underline font-semibold text-[9px]">
+          Réinitialiser
+        </button>
       </div>
+
+      <!-- Liste scrollable des résultats trouvés -->
+      <div id="adv-results-list" class="space-y-1 max-h-52 overflow-y-auto custom-scrollbar-indigo pr-1"></div>
     </div>
   </div>
 
@@ -670,7 +671,7 @@
       "Égypte": { type: "Gouvernorats", total: 27 },
       "Allemagne": { type: "Länder", total: 16 },
       "Italie": { type: "Régions", total: 20 },
-      "Espagne": { type: "Communautés", total: 17 },
+      "Espagne": { type: "Communautés", total: 17, provType: "Provinces", provTotal: 50 },
       "États-Unis": { type: "États", total: 50 }
     };
 
@@ -688,6 +689,7 @@
         transport: "avion",
         era_group: "contemporain",
         era_label: "Époque Contemporaine & Récif Géologique",
+        century: "XXe siècle",
         category: "plage",
         counts: { plage: 1 },
         lat: 27.2579,
@@ -710,6 +712,7 @@
         transport: "route",
         era_group: "nature",
         era_label: "Temps Géologique & Corallien",
+        century: "Temps géologique",
         category: "plage",
         counts: { plage: 1 },
         lat: 27.0250,
@@ -732,6 +735,7 @@
         transport: "avion",
         era_group: "pharaonique",
         era_label: "Antiquité Pharaonique (-1264 av. J.-C.)",
+        century: "Antiquité (XIIIe siècle av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 22.3372,
@@ -754,6 +758,7 @@
         transport: "route",
         era_group: "pharaonique",
         era_label: "Antiquité Pharaonique (-1290 av. J.-C.)",
+        century: "Antiquité (XIIIe siècle av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 25.7328,
@@ -776,6 +781,7 @@
         transport: "route",
         era_group: "pharaonique",
         era_label: "Antiquité Pharaonique (-1400 av. J.-C.)",
+        century: "Antiquité (XIVe siècle av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 25.6994,
@@ -798,6 +804,7 @@
         transport: "route",
         era_group: "contemporain",
         era_label: "Époque Contemporaine (1975)",
+        century: "XXe siècle",
         category: "musee",
         counts: { musee: 1 },
         lat: 25.6983,
@@ -820,6 +827,7 @@
         transport: "bateau",
         era_group: "ptolemaique",
         era_label: "Période Ptolémaïque (-180 av. J.-C.)",
+        century: "Antiquité (IIe siècle av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 24.4536,
@@ -842,6 +850,7 @@
         transport: "bateau",
         era_group: "ptolemaique",
         era_label: "Période Ptolémaïque (-237 av. J.-C.)",
+        century: "Antiquité (IIIe siècle av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 24.9778,
@@ -864,6 +873,7 @@
         transport: "bateau",
         era_group: "ptolemaique",
         era_label: "Période Gréco-Romaine (Ier-IIIe siècle)",
+        century: "Antiquité (Ier siècle)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 25.2934,
@@ -886,6 +896,7 @@
         transport: "bateau",
         era_group: "ptolemaique",
         era_label: "Période Ptolémaïque & Romaine (-380)",
+        century: "Antiquité (IVe siècle av. J.-C.)",
         category: "archeologie",
         counts: { archeologie: 1, unesco: 1 },
         lat: 24.0255,
@@ -908,6 +919,7 @@
         transport: "bateau",
         era_group: "pharaonique",
         era_label: "Antiquité & Nubie Historique",
+        century: "Antiquité",
         category: "ville",
         counts: { ville: 1, musee: 1 },
         lat: 24.0889,
@@ -931,6 +943,7 @@
         transport: "route",
         era_group: "nature",
         era_label: "Ère Glaciaire & Temps Géologique",
+        century: "Temps géologique",
         category: "lac",
         counts: { lac: 1, rando: 1, parc_naturel: 1 },
         lat: 42.2575,
@@ -954,6 +967,7 @@
         transport: "route",
         era_group: "medievale",
         era_label: "Époque Génoise (XVIe siècle - 1562)",
+        century: "XVIe siècle",
         category: "rando",
         counts: { rando: 1, plage: 1 },
         lat: 42.7319,
@@ -977,6 +991,7 @@
         transport: "route",
         era_group: "medievale",
         era_label: "Époque Génoise & Pastorale",
+        century: "XVIe siècle",
         category: "cascade",
         counts: { cascade: 1, rando: 1 },
         lat: 42.3585,
@@ -1000,6 +1015,7 @@
         transport: "avion",
         era_group: "contemporain",
         era_label: "Époque Impressionniste (1883)",
+        century: "XIXe siècle",
         category: "ville",
         counts: { ville: 1 },
         lat: 49.0753,
@@ -1028,6 +1044,28 @@
       rando: { label: "Rando", icon: "fa-person-hiking", color: "#059669", section: "nature", active: true },
       parc_naturel: { label: "Parc naturel", icon: "fa-tree", color: "#16a34a", section: "nature", active: true }
     };
+
+    // Référentiel chronologique rigoureux : Antiquité puis Ve au XXIe siècle
+    const CHRONOLOGICAL_CENTURIES = [
+      "Antiquité",
+      "Ve siècle",
+      "VIe siècle",
+      "VIIe siècle",
+      "VIIIe siècle",
+      "IXe siècle",
+      "Xe siècle",
+      "XIe siècle",
+      "XIIe siècle",
+      "XIIIe siècle",
+      "XIVe siècle",
+      "XVe siècle",
+      "XVIe siècle",
+      "XVIIe siècle",
+      "XVIIIe siècle",
+      "XIXe siècle",
+      "XXe siècle",
+      "XXIe siècle"
+    ];
 
     let currentMode = 'globe';
     let myGlobe = null;
@@ -1178,13 +1216,18 @@
       closeQuickSearchResults();
 
       if (willOpen) {
-        computeAllStatistics();
+        if (popupId === 'modal-advanced') {
+          initAdvancedFilterOptions();
+          runAdvancedFilter();
+        } else {
+          computeAllStatistics();
+        }
         popup.classList.remove('hidden');
       }
     }
 
     function closeAllPopups() {
-      ['modal-home', 'modal-territories', 'modal-odyssey', 'modal-altitude', 'modal-chrono'].forEach(id => {
+      ['modal-home', 'modal-territories', 'modal-advanced', 'modal-altitude', 'modal-chrono'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
@@ -1209,6 +1252,130 @@
       }
     }
 
+    /* MODULE FILTRE POUSSÉ MULTI-CRITÈRES AVEC CHRONOLOGIE STRICTE */
+    function initAdvancedFilterOptions() {
+      const selectCountry = document.getElementById('adv-filter-country');
+      const selectCategory = document.getElementById('adv-filter-category');
+      const selectCentury = document.getElementById('adv-filter-century');
+
+      if (!selectCountry || !selectCategory || !selectCentury) return;
+      if (selectCentury.children.length > 1) return; // Déjà initialisé
+
+      // 1. Remplissage des pays
+      const countries = Array.from(new Set(travelSpots.map(s => s.country))).sort((a,b) => a.localeCompare(b,'fr'));
+      countries.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.innerText = c;
+        selectCountry.appendChild(opt);
+      });
+
+      // 2. Remplissage des catégories
+      Object.keys(CATEGORIES).forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.innerText = CATEGORIES[k].label;
+        selectCategory.appendChild(opt);
+      });
+
+      // 3. Remplissage chronologique rigoureux : Antiquité puis Ve au XXIe siècle (sans ère glaciaire)
+      CHRONOLOGICAL_CENTURIES.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.innerText = c;
+        selectCentury.appendChild(opt);
+      });
+    }
+
+    function spotMatchesCentury(spot, centuryVal) {
+      if (centuryVal === 'all') return true;
+      const sc = spot.century || "";
+
+      if (centuryVal === "Antiquité") {
+        return sc.toLowerCase().includes("antiquité") || 
+               sc.includes("av. J.-C.") || 
+               spot.era_group === "pharaonique" || 
+               spot.era_group === "ptolemaique";
+      }
+
+      // Siècle précis après l'Antiquité (Ve au XXIe) : exclut expressément l'Antiquité (av. J.-C.)
+      if (sc.includes("av. J.-C.")) return false;
+      return sc.includes(centuryVal);
+    }
+
+    function runAdvancedFilter() {
+      const countryVal = document.getElementById('adv-filter-country')?.value || 'all';
+      const catVal = document.getElementById('adv-filter-category')?.value || 'all';
+      const centuryVal = document.getElementById('adv-filter-century')?.value || 'all';
+      const unescoOnly = document.getElementById('adv-filter-unesco')?.checked || false;
+
+      const filtered = travelSpots.filter(s => {
+        if (countryVal !== 'all' && s.country !== countryVal) return false;
+        
+        if (catVal !== 'all') {
+          const hasCount = s.counts && typeof s.counts[catVal] === 'number' && s.counts[catVal] > 0;
+          const isDirectCat = s.category === catVal;
+          if (!hasCount && !isDirectCat) return false;
+        }
+
+        if (!spotMatchesCentury(s, centuryVal)) return false;
+
+        if (unescoOnly) {
+          const isUnesco = (s.counts && s.counts.unesco) || s.category === 'unesco';
+          if (!isUnesco) return false;
+        }
+
+        return true;
+      });
+
+      const countEl = document.getElementById('adv-results-count');
+      const listEl = document.getElementById('adv-results-list');
+      if (countEl) countEl.innerText = filtered.length;
+      if (!listEl) return;
+
+      listEl.innerHTML = '';
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <div class="p-3 text-center text-[10px] text-slate-400 bg-slate-900/50 rounded-xl">
+            Aucun site ne correspond à cette combinaison de critères.
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(spot => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-900/70 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 cursor-pointer transition select-none group';
+        item.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0 pr-1">
+            <span class="text-sm shrink-0 group-hover:scale-110 transition-transform">${spot.flag || '📍'}</span>
+            <div class="min-w-0">
+              <div class="text-[11px] font-bold text-white truncate">${spot.name}</div>
+              <div class="text-[9px] text-cyan-400 truncate">${spot.country} · ${spot.century || spot.era_group || ''}</div>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 group-hover:text-cyan-300 transition-colors shrink-0"></i>
+        `;
+        item.onclick = () => {
+          closeAllPopups();
+          selectSpot(spot);
+        };
+        listEl.appendChild(item);
+      });
+    }
+
+    function resetAdvancedFilters() {
+      const c = document.getElementById('adv-filter-country');
+      const k = document.getElementById('adv-filter-category');
+      const t = document.getElementById('adv-filter-century');
+      const u = document.getElementById('adv-filter-unesco');
+      if (c) c.value = 'all';
+      if (k) k.value = 'all';
+      if (t) t.value = 'all';
+      if (u) u.checked = false;
+      runAdvancedFilter();
+    }
+
     /* MOTEUR CENTRALISÉ DES STATISTIQUES (0% CPU au repos - Temps d'exécution : < 1 ms) */
     function computeAllStatistics() {
       if (!travelSpots || travelSpots.length === 0) return;
@@ -1223,17 +1390,12 @@
       let westSpot = travelSpots[0];
       let eastSpot = travelSpots[0];
 
-      // 2. MODES DE TRANSPORT
-      let kmAir = 0;
-      let kmRoad = 0;
-      let kmSea = 0;
-
-      // 3. ALTIMÈTRE & ÎLES
+      // 2. ALTIMÈTRE & ÎLES
       let zenithSpot = travelSpots[0];
       let nadirSpot = travelSpots[0];
       let islandCount = 0;
 
-      // 4. UNESCO & CIVILISATIONS
+      // 3. UNESCO & CIVILISATIONS
       let unescoCount = 0;
       let chronoMap = {
         pharaonique: { label: "Antiquité Pharaonique", span: "-1500 à -1200 av. J.-C.", icon: "🏺", count: 0, color: "#f59e0b" },
@@ -1243,7 +1405,7 @@
         nature: { label: "Temps Géologique & Ère Glaciaire", span: "Temps long", icon: "🌿", count: 0, color: "#10b981" }
       };
 
-      // 5. PAYS, CONTINENTS & SUBDIVISIONS
+      // 4. PAYS, CONTINENTS & SUBDIVISIONS
       const visitedCountries = new Set();
       const continentCount = { "Europe": 0, "Afrique": 0, "Asie": 0, "Amériques": 0, "Océanie": 0 };
       const subdivData = {};
@@ -1260,19 +1422,6 @@
         if (s.lat < southSpot.lat) southSpot = s;
         if (s.lng < westSpot.lng) westSpot = s;
         if (s.lng > eastSpot.lng) eastSpot = s;
-
-        // Transport
-        const mode = s.transport || "route";
-        if (mode === "avion") {
-          kmAir += d;
-        } else if (mode === "bateau") {
-          kmSea += Math.round(d * 0.15) + 40; // navigation locale sur le Nil / Mer Rouge
-          kmAir += d; // vol pour y arriver
-        } else {
-          // Route en montagne corse : coefficient de détour
-          const roadDist = s.country === "France" ? Math.round(d * 1.5) : Math.round(d * 1.25);
-          kmRoad += roadDist;
-        }
 
         // Altitude
         const alt = typeof s.altitude === 'number' ? s.altitude : 50;
@@ -1365,7 +1514,6 @@
         const continentIcons = { "Europe": "🇪🇺", "Afrique": "🌍", "Asie": "🌏", "Amériques": "🌎", "Océanie": "🌊" };
         Object.keys(CONTINENT_TOTALS).forEach(cont => {
           const totalCountries = CONTINENT_TOTALS[cont];
-          // Calcul des pays uniques visités dans ce continent
           const visitedInCont = new Set(travelSpots.filter(s => s.continent === cont).map(s => s.country)).size;
           const pct = Math.round((visitedInCont / totalCountries) * 100);
 
@@ -1424,25 +1572,6 @@
           subdivList.appendChild(card);
         });
       }
-
-      // --- POPUP 3 : KILOMÉTRAGE DIFFÉRENCIÉ ---
-      const totalKm = kmAir + kmRoad + kmSea;
-      const totalKmEl = document.getElementById('stat-odyssey-total-km');
-      if (totalKmEl) totalKmEl.innerText = `${totalKm.toLocaleString('fr-FR')} km`;
-
-      const airKmEl = document.getElementById('stat-km-air');
-      const roadKmEl = document.getElementById('stat-km-road');
-      const seaKmEl = document.getElementById('stat-km-sea');
-      if (airKmEl) airKmEl.innerText = `${kmAir.toLocaleString('fr-FR')} km`;
-      if (roadKmEl) roadKmEl.innerText = `${kmRoad.toLocaleString('fr-FR')} km`;
-      if (seaKmEl) seaKmEl.innerText = `${kmSea.toLocaleString('fr-FR')} km`;
-
-      const barAir = document.getElementById('stat-bar-air');
-      const barRoad = document.getElementById('stat-bar-road');
-      const barSea = document.getElementById('stat-bar-sea');
-      if (barAir) barAir.style.width = `${Math.round((kmAir / (totalKm || 1)) * 100)}%`;
-      if (barRoad) barRoad.style.width = `${Math.round((kmRoad / (totalKm || 1)) * 100)}%`;
-      if (barSea) barSea.style.width = `${Math.round((kmSea / (totalKm || 1)) * 100)}%`;
 
       // --- POPUP 4 : ALTIMÈTRE & ÎLES ---
       const zenithAlt = typeof zenithSpot.altitude === 'number' ? zenithSpot.altitude : 1743;
@@ -1625,7 +1754,7 @@
         closeCountriesMenu();
       }
 
-      ['modal-home', 'modal-territories', 'modal-odyssey', 'modal-altitude', 'modal-chrono'].forEach(id => {
+      ['modal-home', 'modal-territories', 'modal-advanced', 'modal-altitude', 'modal-chrono'].forEach(id => {
         const modal = document.getElementById(id);
         const trigger = document.getElementById('btn-popup-' + id.replace('modal-', ''));
         if (modal && !modal.contains(e.target) && trigger && !trigger.contains(e.target)) {
