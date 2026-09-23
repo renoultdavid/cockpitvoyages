@@ -3150,11 +3150,11 @@
       myLeafletMap.addLayer(leafletMarkersGroup);
 
       myLeafletMap.on('zoomend', () => {
-        if (currentMode === 'map' && myLeafletMap.getZoom() <= 4 && !isTransitioningMode) {
+        if (currentMode === 'map' && myLeafletMap.getZoom() <= 5 && !isTransitioningMode) {
           isTransitioningMode = true;
           const center = myLeafletMap.getCenter();
           setViewingMode('globe', { lat: center.lat, lng: center.lng, altitude: 2.1 });
-          setTimeout(() => { isTransitioningMode = false; }, 1000);
+          setTimeout(() => { isTransitioningMode = false; }, 800);
         }
       });
 
@@ -3255,10 +3255,16 @@
 
         if (!myLeafletMap) {
           initLeafletMap([lat, lng], zoom);
-        } else {
-          myLeafletMap.invalidateSize();
-          myLeafletMap.setView([lat, lng], zoom, { animate: false });
         }
+        
+        // Laisse au navigateur un tick pour afficher le conteneur puis recalcule la taille et les grappes
+        setTimeout(() => {
+          if (myLeafletMap) {
+            myLeafletMap.invalidateSize();
+            myLeafletMap.setView([lat, lng], zoom, { animate: false });
+            updateLeafletDisplay();
+          }
+        }, 100);
       } else {
         let lat = targetCoords ? targetCoords.lat : 27.2579;
         let lng = targetCoords ? normalizeLongitude(targetCoords.lng) : 33.8116;
@@ -3624,7 +3630,7 @@
 
     function zoomMapOut() {
       if (currentMode === 'map' && myLeafletMap) {
-        if (myLeafletMap.getZoom() <= 4) {
+        if (myLeafletMap.getZoom() <= 5) {
           const center = myLeafletMap.getCenter();
           setViewingMode('globe', { lat: center.lat, lng: center.lng, altitude: 2.1 });
         } else {
