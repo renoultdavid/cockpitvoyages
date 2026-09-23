@@ -3123,11 +3123,12 @@ function spotMatchesFilter(spot) {
     function checkContinuousGlobeZoom() {
       if (currentMode !== 'globe' || !myGlobe || isTransitioningMode) return;
       const pov = myGlobe.pointOfView();
-      if (pov && pov.altitude <= 0.26) {
+      // Seuil ajusté à 0.22 et verrou strict pour éviter les faux rebonds au retour 2D -> 3D
+      if (pov && typeof pov.altitude === 'number' && pov.altitude <= 0.22) {
         isTransitioningMode = true;
         const target = activeCursorCoords || getExactGlobeCenterCoords();
         setViewingMode('map', target, 9);
-        setTimeout(() => { isTransitioningMode = false; }, 1000);
+        setTimeout(() => { isTransitioningMode = false; }, 1200);
       }
     }
 
@@ -3304,11 +3305,10 @@ function spotMatchesFilter(spot) {
       myLeafletMap.addLayer(leafletMarkersGroup);
 
       myLeafletMap.on('zoomend', () => {
-        if (currentMode === 'map' && myLeafletMap.getZoom() <= 4 && !isTransitioningMode) {
+        if (currentMode === 'map' && myLeafletMap.getZoom() <= 5 && !isTransitioningMode) {
           isTransitioningMode = true;
           const center = myLeafletMap.getCenter();
           setViewingMode('globe', { lat: center.lat, lng: center.lng, altitude: 2.1 });
-          setTimeout(() => { isTransitioningMode = false; }, 1000);
         }
       });
 
@@ -3441,10 +3441,15 @@ function spotMatchesFilter(spot) {
         btnRotate.classList.remove('hidden');
 
         if (myGlobe) {
+          // Verrouille la détection automatique le temps que le globe monte à 2.1
+          isTransitioningMode = true;
           const controls = myGlobe.controls();
           if (controls) controls.enabled = true;
           setTimeout(onWindowResize, 100);
-          myGlobe.pointOfView({ lat: lat, lng: lng, altitude: altitude }, 800);
+          myGlobe.pointOfView({ lat: lat, lng: lng, altitude: altitude }, 600);
+          setTimeout(() => {
+            isTransitioningMode = false;
+          }, 1000);
         }
       }
       updateSpotToggleButton();
