@@ -2106,6 +2106,30 @@
   link: "https://photos.google.com/share/AF1QipO0jTn-dO4jDmXY8MNR6sDppA4-tBIaecZOuzjWih8pW6aHzKvMmIOLepaCHaKp5w?key=aE1SckM4UDhSWkl0MVZMb210cW9HZ1Joa0RvTHlB"
 },
       {
+  id: "port_navalo_promontoire",
+  name: "Arzon - Promontoire de Port Navalo",
+  region: "Bretagne (Morbihan)",
+  country: "France",
+  continent: "Europe",
+  flag: "🇫🇷",
+  subdiv: "Morbihan",
+  region_admin: "Bretagne",
+  altitude: 15,
+  is_island: false,
+  transport: "route",
+  era_group: "contemporain",
+  era_label: "Époque Contemporaine & Littorale",
+  century: "XXe siècle",
+  category: "", // <-- Laissé vide : il va automatiquement et par défaut dans "Tous les POI"
+  counts: {}, 
+  lat: 47.5502,
+  lng: -2.9154,
+  image: "https://lh3.googleusercontent.com/pw/AP1GczPpn3mcbR_cefuqRbq7u0gfKmaYd3BYCwmfwpWzA_qZfaRV1Xkq2B7_4yJoS4L6423l8B4N6Nm8L5yXDn3FIXHb0GiijFzHAbLeEPd1liLDJFrW3wY6-dRUes7GZQnz9KExWmFPMoei6F0mA9LDuuZOHg=w2506-h1879-s-no-gm?authuser=0",
+  description: "Avancée rocheuse spectaculaire marquant la pointe occidentale de la presqu'île de Rhuys, le promontoire de Port Navalo veille tel un gardien de pierre à l'embouchure du golfe du Morbihan, là où les eaux tumultueuses de l'océan Atlantique viennent se heurter aux courants intérieurs de la petite mer. Site naturel d'une beauté saisissante façonné par les vents et les marées parmi les plus puissantes d'Europe, ce promontoire offre un panorama grandiose sur l'entrée du golfe, le phare historique, les îles de Houat et Hoedic au large, ainsi que sur le ballet incessant des voiliers et des navires reliant les îles d'un archipel légendaire. Fréquenté depuis la nuit des temps par les marins et les navigateurs redoutant la violence de ses remous, le site allie la rudesse de son cordon granitique littoral à la douceur iodée des paysages bretons du Morbihan.",
+  visiter: "La découverte s'amorce par les sentiers côtiers aménagés le long des falaises dominant les courants marins, permettant d'observer les remous spectaculaires de la marée montante ou descendante. En contournant la pointe vers le sémaphore et le vieux port, le visiteur profite d'une vue à trois cent soixante degrés idéale pour admirer les couchers de soleil flamboyants sur l'océan. C'est l'étape parfaite pour respirer l'air du large et s'imprégner de l'atmosphère maritime de la presqu'île de Rhuys avant d'embarquer vers les îles.",
+  link: "https://photos.google.com/share/AF1QipPb2RZUrZYfIddwN_N0UP-fz4jVTYg8fCDgm8Y9JSsv2B5LfXJfa4tlgBswvp_R2Q?key=RlpMbXVDNWdZSTJpYm1QeEFvVm9HOWxLZlVoMUlR"
+},
+      {
         id: "cascade_pont_bucatoghju",
         name: "Cascade & Pont génois du Bucatoghju",
         region: "Haute-Corse (Costa Verde)",
@@ -2157,19 +2181,20 @@
     ];
 
     // Dictionnaire officiel des filtres : Culture et Nature (avec l'item Île)
-    const CATEGORIES = {
-      ville: { label: "Ville / Village", icon: "fa-city", color: "#b45309", section: "culture", active: true },
-      musee: { label: "Musée", icon: "fa-landmark", color: "#a16207", section: "culture", active: true },
-      religieux: { label: "Édifice religieux", icon: "fa-church", color: "#854d0e", section: "culture", active: true },
-      chateau: { label: "Château / Palais", icon: "fa-chess-rook", color: "#713f12", section: "culture", active: true },
-      pont: { label: "Ponts & Ouvrages d'art", icon: "fa-archway", color: "#a16207", section: "culture", active: true },
-    place: { label: "Places de village & centre-ville", icon: "fa-square-parking", color: "#b45309", section: "culture", active: true },
-    fontaine: { label: "Fontaines & Sources", icon: "fa-fountain", color: "#92400e", section: "culture", active: true },
-    batiment_culturel: { label: "Bâtiments culturels", icon: "fa-building-columns", color: "#78350f", section: "culture", active: true },
-    habitation: { label: "Habitations historiques", icon: "fa-house-user", color: "#451a03", section: "culture", active: true },
-      archeologie: { label: "Site archéologique", icon: "fa-monument", color: "#78350f", section: "culture", active: true },
-      unesco: { label: "Site UNESCO", icon: "fa-award", color: "#b45309", section: "culture", active: true },
-      megalithe: { label: "Mégalithe", icon: "fa-archway", color: "#57534e", section: "culture", active: true },
+const CATEGORIES = {
+  tous: { label: "Tous les POI", icon: "fa-layer-group", color: "#06b6d4", section: "culture", active: true },
+  ville: { label: "Ville / Village", icon: "fa-city", color: "#b45309", section: "culture", active: true },
+  musee: { label: "Musée", icon: "fa-landmark", color: "#a16207", section: "culture", active: true },
+  religieux: { label: "Édifice religieux", icon: "fa-church", color: "#854d0e", section: "culture", active: true },
+  chateau: { label: "Château / Palais", icon: "fa-chess-rook", color: "#713f12", section: "culture", active: true },
+  pont: { label: "Ponts & Ouvrages d'art", icon: "fa-archway", color: "#a16207", section: "culture", active: true },
+  place: { label: "Places de village & centre-ville", icon: "fa-square-parking", color: "#b45309", section: "culture", active: true },
+  fontaine: { label: "Fontaines & Sources", icon: "fa-fountain", color: "#92400e", section: "culture", active: true },
+  batiment_culturel: { label: "Bâtiments culturels", icon: "fa-building-columns", color: "#78350f", section: "culture", active: true },
+  habitation: { label: "Habitations historiques", icon: "fa-house-user", color: "#451a03", section: "culture", active: true },
+  archeologie: { label: "Site archéologique", icon: "fa-monument", color: "#78350f", section: "culture", active: true },
+  unesco: { label: "Site UNESCO", icon: "fa-award", color: "#b45309", section: "culture", active: true },
+  megalithe: { label: "Mégalithe", icon: "fa-archway", color: "#57534e", section: "culture", active: true },
 
       cascade: { label: "Cascade", icon: "fa-water", color: "#0284c7", section: "nature", active: true },
       lac: { label: "Lac", icon: "fa-droplet", color: "#0ea5e9", section: "nature", active: true },
@@ -2217,9 +2242,24 @@
     let isCountriesMenuOpen = false;
 
     function isOnlyIslandFilterActive() {
-      if (!CATEGORIES.ile || !CATEGORIES.ile.active) return false;
-      return Object.keys(CATEGORIES).every(key => key === 'ile' ? CATEGORIES[key].active : !CATEGORIES[key].active);
-    }
+  if (!CATEGORIES.ile || !CATEGORIES.ile.active) return false;
+  return Object.keys(CATEGORIES).every(key => key === 'ile' ? CATEGORIES[key].active : !CATEGORIES[key].active);
+}
+
+// Règle d'affichage universelle : affiche TOUS les sites (avec ou sans catégorie)
+function spotMatchesFilter(spot) {
+  // 1. Si le bouton "Tous les POI" est coché, on affiche tout sans exception :
+  if (CATEGORIES.tous && CATEGORIES.tous.active) return true;
+
+  // 2. Si le filtre Île seul est actif :
+  if (isOnlyIslandFilterActive()) return spot.is_island === true;
+
+  // 3. Si le POI n'a pas de catégorie (comme Port Navalo ou l'écluse), il reste visible si "tous" est actif :
+  if (!spot.category || !CATEGORIES[spot.category]) return true;
+
+  // 4. Sinon, on vérifie si sa catégorie est cochée :
+  return CATEGORIES[spot.category].active;
+}
 
     function getIslandClustersData() {
       const islandMap = new Map();
